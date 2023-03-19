@@ -158,7 +158,7 @@ class EGSCTrainer(object):
                 #print('aug_feature_list shape', aug_feature_list.shape)
 
                 # calculate the counts of cycles of length k up to a maximum length of max_k
-                max_k = 10
+                max_k = min(10, size)
                 #cycle_counts = np.zeros((max_k,))
 
                 for k in range(3, max_k+1):

@@ -5,7 +5,7 @@
 ## Train & Test
 If you run the experiment on AIDS, then
 ```
-python src/main.py --dataset AIDS700nef --gnn-operator gin --featureAug 1 --epochs 6000 --batch-size 128 --learning-rate 0.001
+python src/main.py --dataset AIDS700nef --gnn-operator gin --epochs 6000 --batch-size 128 --learning-rate 0.001
 ```
 If you run the experiment on LINUX, then
 ```
