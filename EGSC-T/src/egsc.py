@@ -34,7 +34,7 @@ class EGSCTrainer(object):
         self.best_prec_at_20 = 0
         self.best_model_error = float('inf')
 
-        print('self.args.featureAug', self.args.featureAug)
+        print('self.args.feature_aug', self.args.feature_aug)
 
 
     def setup_model(self):
