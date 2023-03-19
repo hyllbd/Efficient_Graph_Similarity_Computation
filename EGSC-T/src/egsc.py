@@ -14,6 +14,8 @@ from torch_geometric.utils import to_dense_batch, to_dense_adj, degree
 from torch_geometric.datasets import GEDDataset
 from torch_geometric.transforms import OneHotDegree
 
+
+
 # import matplotlib.pyplot as plt
 
 from model import EGSCT_generator, EGSCT_classifier
@@ -91,8 +93,10 @@ class EGSCTrainer(object):
         self.real_data_size = self.nged_matrix.size(0)
         
         if self.args.synth:
-            self.synth_data_1, self.synth_data_2, _, synth_nged_matrix = gen_pairs(self.training_graphs.shuffle()[:500], 0, 3)  
-            
+            if self.args.feature_aug == 0:
+                self.synth_data_1, self.synth_data_2, _, synth_nged_matrix = gen_pairs(self.training_graphs.shuffle()[:500], 0, 3)  
+            else:
+                self.synth_data_1, self.synth_data_2, _, synth_nged_matrix = gen_pairs(random.shuffle(self.training_graphs)[:500], 0, 3)  
             real_data_size = self.nged_matrix.size(0)
             synth_data_size = synth_nged_matrix.size(0)
             self.nged_matrix = torch.cat((self.nged_matrix, torch.full((real_data_size, synth_data_size), float('inf'))), dim=1)
@@ -134,10 +138,16 @@ class EGSCTrainer(object):
         if self.args.synth:
             synth_data_ind = random.sample(range(len(self.synth_data_1)), 100)
         
-        source_loader = DataLoader(self.training_graphs.shuffle() + 
-            ([self.synth_data_1[i] for i in synth_data_ind] if self.args.synth else []), batch_size=self.args.batch_size)
-        target_loader = DataLoader(self.training_graphs.shuffle() + 
-            ([self.synth_data_2[i] for i in synth_data_ind] if self.args.synth else []), batch_size=self.args.batch_size)
+        if self.args.feature_aug == 0:
+            source_loader = DataLoader(self.training_graphs.shuffle() + 
+                ([self.synth_data_1[i] for i in synth_data_ind] if self.args.synth else []), batch_size=self.args.batch_size)
+            target_loader = DataLoader(self.training_graphs.shuffle() + 
+                ([self.synth_data_2[i] for i in synth_data_ind] if self.args.synth else []), batch_size=self.args.batch_size)
+        else:
+            source_loader = DataLoader(random.shuffle(self.training_graphs) + 
+                ([self.synth_data_1[i] for i in synth_data_ind] if self.args.synth else []), batch_size=self.args.batch_size)
+            target_loader = DataLoader(random.shuffle(self.training_graphs) + 
+                ([self.synth_data_2[i] for i in synth_data_ind] if self.args.synth else []), batch_size=self.args.batch_size)
         
         return list(zip(source_loader, target_loader))
 
@@ -191,7 +201,7 @@ class EGSCTrainer(object):
         self.model_g.train()
         self.model_c.train()
 
-        
+        print('self.args.feature_aug', self.args.feature_aug)
         epochs = trange(self.args.epochs, leave=True, desc = "Epoch")
         loss_list = []
         loss_list_test = []
@@ -206,15 +216,26 @@ class EGSCTrainer(object):
                     t = tqdm(total=cnt_test*cnt_train, position=2, leave=False, desc = "Validation")
                     scores = torch.empty((cnt_test, cnt_train))
                     
-                    for i, g in enumerate(self.testing_graphs[:cnt_test].shuffle()):
-                        source_batch = Batch.from_data_list([g]*cnt_train)
-                        target_batch = Batch.from_data_list(self.training_graphs[:cnt_train].shuffle())
-                        data = self.transform((source_batch, target_batch))
-                        target = data["target"]
-                        prediction = self.model_c(self.model_g(data)) # why???
-                        
-                        scores[i] = F.mse_loss(prediction, target, reduction='none').detach()
-                        t.update(cnt_train)
+                    if self.args.feature_aug == 0:
+                        for i, g in enumerate(self.testing_graphs[:cnt_test].shuffle()):
+                            source_batch = Batch.from_data_list([g]*cnt_train)
+                            target_batch = Batch.from_data_list(self.training_graphs[:cnt_train].shuffle())
+                            data = self.transform((source_batch, target_batch))
+                            target = data["target"]
+                            prediction = self.model_c(self.model_g(data)) # why???
+                            
+                            scores[i] = F.mse_loss(prediction, target, reduction='none').detach()
+                            t.update(cnt_train)
+                    else:
+                        for i, g in enumerate(random.shuffle(self.testing_graphs[:cnt_test])):
+                            source_batch = Batch.from_data_list([g]*cnt_train)
+                            target_batch = Batch.from_data_list(random.shuffle(self.training_graphs[:cnt_train]))
+                            data = self.transform((source_batch, target_batch))
+                            target = data["target"]
+                            prediction = self.model_c(self.model_g(data)) # why???
+                            
+                            scores[i] = F.mse_loss(prediction, target, reduction='none').detach()
+                            t.update(cnt_train)
                     
                     t.close()
                     loss_list_test.append(scores.mean().item())
