@@ -329,8 +329,21 @@ def feature_augmentation(dataset, feature_aug_options):
                     if(Ak[j][j] > 0):
                         aug_feature_list[j][k] = float(min(round(Ak[j][j] / (2*size), 2), 1))
 
+        # fast ID-GIN original method - You, Jiaxuan, et al. 
+        # "Identity-aware graph neural networks." AAAI 2021
+        elif feature_aug_options == 3:
+            max_k = 10
+            for k in range(1, max_k+1):
+                Ak = np.linalg.matrix_power(A, k)
+                for j in range(0, len(Ak)):
+                    if(Ak[j][j] > 0):
+                        aug_feature_list[j][k] = Ak[j][j]
+        
+            print('edge_index', edge_index)
+            print('aug_feature_list', aug_feature_list)
+            print('graph_item.x', graph_item.x)
 
-        elif feature_aug_options == 3: # only count the number of triangles
+        elif feature_aug_options == 4: # only count the number of triangles
             max_k = 3
 
             for k in range(3, max_k+1):
