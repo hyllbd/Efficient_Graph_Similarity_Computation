@@ -160,7 +160,7 @@ class EGSCTrainer(object):
                 
                 
                 # method 1: fast identity GIN
-                if self.args.feature_aug == 1:
+                if self.args.feature_aug == 1: # save if a route exitst
                 # calculate the counts of length k up to a maximum length of max_k
                     max_k = min(10, size)
                     for k in range(3, max_k+1):
@@ -169,8 +169,17 @@ class EGSCTrainer(object):
                         for j in range(0, len(Ak)):
                             if(Ak[j][j] > 0):
                                 aug_feature_list[j][k] = 1
+                elif self.args.feature_aug == 2: # save the count of routes
+                    max_k = min(10, size)
+                    for k in range(3, max_k+1):
+                        Ak = np.linalg.matrix_power(A, k)
 
-                elif self.args.feature_aug == 2: # only count triangles
+                        for j in range(0, len(Ak)):
+                            if(Ak[j][j] > 0):
+                                aug_feature_list[j][k] = round(Ak[j][j] / 2)
+
+
+                elif self.args.feature_aug == 3: # only count triangles
                     max_k = 3
 
                     for k in range(3, max_k+1):
