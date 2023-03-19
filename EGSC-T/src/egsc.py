@@ -115,7 +115,7 @@ class EGSCTrainer(object):
         # print(max_node_number)
         def feature_augmentation(dataset):
             print('dataset', dataset)
-            copy_dataset = Data.clone(dataset)
+            copy_dataset = copy.deepcopy(dataset)
             temp_dataset = []
 
             for idx, graph_item in enumerate(copy_dataset):
