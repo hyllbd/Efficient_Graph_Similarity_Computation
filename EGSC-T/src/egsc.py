@@ -201,6 +201,9 @@ class EGSCTrainer(object):
             self.training_graphs.transform = one_hot_degree
             self.testing_graphs.transform = one_hot_degree
         
+        print('-----')
+        print('self.number_of_labels', self.testing_graphs[0].x.shape[-1])
+        print('self.args.feature_aug', self.args.feature_aug)
         if self.args.feature_aug != 0:
             self.training_graphs = feature_augmentation(self.training_graphs)
             self.testing_graphs = feature_augmentation(self.testing_graphs)
@@ -216,6 +219,8 @@ class EGSCTrainer(object):
                     
         # self.number_of_labels = self.training_graphs.num_features
         self.number_of_labels = self.testing_graphs[0].x.shape[-1]
+        print('self.number_of_labels', self.testing_graphs[0].x.shape[-1])
+        print('-----')
 
     def create_batches(self):
         """

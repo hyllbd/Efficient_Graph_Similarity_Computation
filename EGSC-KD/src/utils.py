@@ -6,7 +6,7 @@ import random
 from texttable import Texttable
 from torch_geometric.utils import erdos_renyi_graph, to_undirected, to_networkx
 from torch_geometric.data import Data
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 import torch_scatter
 
@@ -223,18 +223,19 @@ def aids_labels(g):
 
 
 def draw_graphs(glist, aids=False):
-    for i, g in enumerate(glist):
-        plt.clf()
-        G = to_networkx(g).to_undirected()
-        if aids:
-            label_list = aids_labels(g)
-            labels = {}
-            for j, node in enumerate(G.nodes()):
-                labels[node] = label_list[j]
-            nx.draw(G, labels=labels)
-        else:
-            nx.draw(G)
-        plt.savefig('graph{}.png'.format(i))
+    ...
+    # for i, g in enumerate(glist):
+    #     plt.clf()
+    #     G = to_networkx(g).to_undirected()
+    #     if aids:
+    #         label_list = aids_labels(g)
+    #         labels = {}
+    #         for j, node in enumerate(G.nodes()):
+    #             labels[node] = label_list[j]
+    #         nx.draw(G, labels=labels)
+    #     else:
+    #         nx.draw(G)
+    #     plt.savefig('graph{}.png'.format(i))
 
 
 def draw_weighted_nodes(filename, g, model):
