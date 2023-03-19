@@ -99,7 +99,7 @@ class EGSCTrainer(object):
         self.real_data_size = self.nged_matrix.size(0)
         
         if self.args.synth:
-            if self.args.feature_aug == 0:
+            if self.args.feature_aug == -1:  # origin shuffle + origin dataset
                 self.synth_data_1, self.synth_data_2, _, synth_nged_matrix = gen_pairs(self.training_graphs.shuffle()[:500], 0, 3)  
             else:
                 random.shuffle(self.training_graphs)
@@ -154,23 +154,23 @@ class EGSCTrainer(object):
                     temp_list = [0 for i in range(11) ]
                     aug_feature_list.append(temp_list)
                 
-
-                #print('aug_feature_list shape', aug_feature_list.shape)
-
+                
+                # method 1: fast identity GIN
+                if self.args.feature_aug == 1:
                 # calculate the counts of cycles of length k up to a maximum length of max_k
-                max_k = min(10, size)
-                #cycle_counts = np.zeros((max_k,))
+                    max_k = min(10, size)
+                    #cycle_counts = np.zeros((max_k,))
 
-                for k in range(3, max_k+1):
-                    Ak = np.linalg.matrix_power(A, k)
-                    # print('---')
-                    # print('k',k)
-                    # print(Ak)
-                    for j in range(0, len(Ak)):
-                        if(Ak[j][j] > 0):
-                            aug_feature_list[j][k] = 1
-                    # print('---')
-                    #cycle_counts[k-1] = np.trace(Ak) // (2*k)
+                    for k in range(3, max_k+1):
+                        Ak = np.linalg.matrix_power(A, k)
+                        # print('---')
+                        # print('k',k)
+                        # print(Ak)
+                        for j in range(0, len(Ak)):
+                            if(Ak[j][j] > 0):
+                                aug_feature_list[j][k] = 1
+                        # print('---')
+                        #cycle_counts[k-1] = np.trace(Ak) // (2*k)
 
 
                 #print('aug_feature_list', aug_feature_list)
@@ -184,7 +184,10 @@ class EGSCTrainer(object):
                 #print('aug_feature_list', aug_feature_list.shape)
                 # graph_item.x = graph_item.x + aug_feature_list
                 # graph_item.x = graph_item.x + aug_feature_list
-                graph_item.x = torch.cat((graph_item.x, aug_feature_list), 1)
+
+                # add aug_feature_list when feature_aug > 0
+                if self.args.feature_aug > 0: 
+                    graph_item.x = torch.cat((graph_item.x, aug_feature_list), 1)
                 #print('graph_item.x', graph_item.x.shape)
                 #print(''graph_item.x', 'graph_item.x')
                 #print('----')
@@ -204,7 +207,8 @@ class EGSCTrainer(object):
         print('-----')
         print('self.number_of_labels', self.testing_graphs[0].x.shape[-1])
         print('self.args.feature_aug', self.args.feature_aug)
-        if self.args.feature_aug != 0:
+
+        if self.args.feature_aug >= 0:
             self.training_graphs = feature_augmentation(self.training_graphs)
             self.testing_graphs = feature_augmentation(self.testing_graphs)
 
@@ -230,7 +234,7 @@ class EGSCTrainer(object):
         if self.args.synth:
             synth_data_ind = random.sample(range(len(self.synth_data_1)), 100)
         
-        if self.args.feature_aug == 0:
+        if self.args.feature_aug < 0:
             source_loader = DataLoader(self.training_graphs.shuffle() + 
                 ([self.synth_data_1[i] for i in synth_data_ind] if self.args.synth else []), batch_size=self.args.batch_size)
             target_loader = DataLoader(self.training_graphs.shuffle() + 
@@ -311,7 +315,7 @@ class EGSCTrainer(object):
                     t = tqdm(total=cnt_test*cnt_train, position=2, leave=False, desc = "Validation")
                     scores = torch.empty((cnt_test, cnt_train))
                     
-                    if self.args.feature_aug == 0:
+                    if self.args.feature_aug < 0:
                         for i, g in enumerate(self.testing_graphs[:cnt_test].shuffle()):
                             source_batch = Batch.from_data_list([g]*cnt_train)
                             target_batch = Batch.from_data_list(self.training_graphs[:cnt_train].shuffle())
