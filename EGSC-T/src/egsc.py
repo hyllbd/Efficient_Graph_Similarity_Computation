@@ -103,9 +103,11 @@ class EGSCTrainer(object):
                 self.synth_data_1, self.synth_data_2, _, synth_nged_matrix = gen_pairs(self.training_graphs.shuffle()[:500], 0, 3)  
             else:
                 # random.shuffle(self.training_graphs)
-                perm = torch.randperm(len(self.training_graphs))
-                temp_dataset = self.training_graphs(perm)
-                self.synth_data_1, self.synth_data_2, _, synth_nged_matrix = gen_pairs(temp_dataset[:500], 0, 3)  
+                # perm = torch.randperm(len(self.training_graphs))
+                # temp_dataset = self.training_graphs(perm)
+                temp_dataset_shuffle = copy.deepcopy(self.training_graphs)
+                random.shuffle(temp_dataset_shuffle)
+                self.synth_data_1, self.synth_data_2, _, synth_nged_matrix = gen_pairs(temp_dataset_shuffle[:500], 0, 3)  
             real_data_size = self.nged_matrix.size(0)
             synth_data_size = synth_nged_matrix.size(0)
             self.nged_matrix = torch.cat((self.nged_matrix, torch.full((real_data_size, synth_data_size), float('inf'))), dim=1)
@@ -248,15 +250,18 @@ class EGSCTrainer(object):
                 ([self.synth_data_2[i] for i in synth_data_ind] if self.args.synth else []), batch_size=self.args.batch_size)
         else:
             print('type', type(self.training_graphs))
-            perm = torch.randperm(len(self.training_graphs))
-            temp_dataset = self.training_graphs(perm)
+            # perm = torch.randperm(len(self.training_graphs))
+            temp_dataset_shuffle = copy.deepcopy(self.training_graphs)
+            random.shuffle(temp_dataset_shuffle)
             # random.shuffle(self.training_graphs)
-            source_loader = DataLoader(temp_dataset + 
+            source_loader = DataLoader(temp_dataset_shuffle + 
                 ([self.synth_data_1[i] for i in synth_data_ind] if self.args.synth else []), batch_size=self.args.batch_size)
-            perm = torch.randperm(len(self.training_graphs))
-            temp_dataset = self.training_graphs(perm)
+            #perm = torch.randperm(len(self.training_graphs))
+            #temp_dataset = self.training_graphs(perm)
             # random.shuffle(self.training_graphs)
-            target_loader = DataLoader(temp_dataset + 
+            temp_dataset_shuffle = copy.deepcopy(self.training_graphs)
+            random.shuffle(temp_dataset_shuffle)
+            target_loader = DataLoader(temp_dataset_shuffle + 
                 ([self.synth_data_2[i] for i in synth_data_ind] if self.args.synth else []), batch_size=self.args.batch_size)
         
         return list(zip(source_loader, target_loader))
