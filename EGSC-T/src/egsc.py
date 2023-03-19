@@ -177,7 +177,7 @@ class EGSCTrainer(object):
 
                         for j in range(0, len(Ak)):
                             if(Ak[j][j] > 0):
-                                aug_feature_list[j][k] = min(round(Ak[j][j] / (2*size), 2), 1)
+                                aug_feature_list[j][k] = float(min(round(Ak[j][j] / (2*size), 2), 1))
 
 
                 elif self.args.feature_aug == 3: # only count triangles
