@@ -14,7 +14,7 @@ from torch_geometric.utils import to_dense_batch, to_dense_adj, degree
 from torch_geometric.datasets import GEDDataset
 from torch_geometric.transforms import OneHotDegree
 
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 from model import EGSCT_generator, EGSCT_classifier
 
@@ -33,6 +33,8 @@ class EGSCTrainer(object):
         self.best_prec_at_10 = 0
         self.best_prec_at_20 = 0
         self.best_model_error = float('inf')
+
+        print('self.args.featureAug', self.args.featureAug)
 
 
     def setup_model(self):
@@ -97,11 +99,18 @@ class EGSCTrainer(object):
             synth_nged_matrix = torch.cat((torch.full((synth_data_size, real_data_size), float('inf')), synth_nged_matrix), dim=1)
             self.nged_matrix = torch.cat((self.nged_matrix, synth_nged_matrix))
         
+        max_node_number = 0
+        for g in self.training_graphs + self.testing_graphs + (self.synth_data_1 + self.synth_data_2 if self.args.synth else []):
+            max_node_number = max(max_node_number, int(degree(g.num_nodes).max().item()))
+        print(max_node_number)
+
+
         if self.training_graphs[0].x is None:
             max_degree = 0
             for g in self.training_graphs + self.testing_graphs + (self.synth_data_1 + self.synth_data_2 if self.args.synth else []):
                 if g.edge_index.size(1) > 0:
                     max_degree = max(max_degree, int(degree(g.edge_index[0]).max().item()))
+            # Adds the node degree as one hot encodings to the node features (functional name: one_hot_degree).        
             one_hot_degree = OneHotDegree(max_degree, cat=False)
             self.training_graphs.transform = one_hot_degree
             self.testing_graphs.transform = one_hot_degree
@@ -142,6 +151,8 @@ class EGSCTrainer(object):
 
         new_data["g1"] = data[0]
         new_data["g2"] = data[1]
+
+        
 
         normalized_ged = self.nged_matrix[data[0]["i"].reshape(-1).tolist(),data[1]["i"].reshape(-1).tolist()].tolist()
         
@@ -200,7 +211,7 @@ class EGSCTrainer(object):
                         target_batch = Batch.from_data_list(self.training_graphs[:cnt_train].shuffle())
                         data = self.transform((source_batch, target_batch))
                         target = data["target"]
-                        prediction = self.model_c(self.model_g(data))
+                        prediction = self.model_c(self.model_g(data)) # why???
                         
                         scores[i] = F.mse_loss(prediction, target, reduction='none').detach()
                         t.update(cnt_train)
@@ -221,7 +232,7 @@ class EGSCTrainer(object):
             epochs.set_description("Epoch (Loss=%g)" % round(loss,5))
             loss_list.append(loss)
             
-        if self.args.plot:
+        if False and self.args.plot:
             plt.plot(loss_list, label="Train")
             plt.plot([*range(0, self.args.epochs, 10)], loss_list_test, label="Validation")
             plt.ylim([0, 0.01])

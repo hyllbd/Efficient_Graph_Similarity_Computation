@@ -14,7 +14,7 @@ from torch_geometric.utils import to_dense_batch, to_dense_adj, degree
 from torch_geometric.datasets import GEDDataset
 from torch_geometric.transforms import OneHotDegree
 
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 from model_kd import EGSC_generator, EGSC_fusion, EGSC_fusion_classifier, EGSC_classifier, EGSC_teacher
 
@@ -273,7 +273,7 @@ class EGSC_KD_Trainer(object):
             loss_list.append(loss)
             loss_list_kd.append(loss_kd)
             
-        if self.args.plot:
+        if False and self.args.plot:
             filename_meta = 'figs/' + self.args.dataset
             filename_meta += '_' + self.args.gnn_operator 
             if self.args.diffpool:
