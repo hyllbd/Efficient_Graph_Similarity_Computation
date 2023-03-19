@@ -214,7 +214,7 @@ class EGSCTrainer(object):
                 g.i = g.i + real_data_size
                     
         # self.number_of_labels = self.training_graphs.num_features
-        number_of_labels = self.testing_graphs[0].x.shape[-1]
+        self.number_of_labels = self.testing_graphs[0].x.shape[-1]
 
     def create_batches(self):
         """
