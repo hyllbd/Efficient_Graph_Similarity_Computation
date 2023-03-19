@@ -180,12 +180,15 @@ class EGSCTrainer(object):
                         # print(Ak)
                         for j in range(0, len(Ak)):
                             if(Ak[j][j] > 0):
-                                aug_feature_list[j][k] = Ak[j][j] // (2*size)
+                                Ak[j][j] = Ak[j][j] // 2 
+                                count_triangle = min(Ak[j][j], 10)
+                                # aug_feature_list[j][k] = round(Ak[j][j] / (2*size),2)
+                                aug_feature_list[j][count_triangle] = 1
 
                 #print('aug_feature_list', aug_feature_list)
 
              
-                # print('aug_feature_list', aug_feature_list)
+                print('aug_feature_list', aug_feature_list)
                 #aug_feature_list = torch.FloatTensor(aug_feature_list)
                 aug_feature_list = torch.tensor(aug_feature_list)
                 #print('----')
