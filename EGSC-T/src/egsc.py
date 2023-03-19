@@ -21,6 +21,12 @@ from torch_geometric.transforms import OneHotDegree
 from model import EGSCT_generator, EGSCT_classifier
 
 import pdb
+import copy
+from itertools import repeat
+from torch_geometric.data import Data
+from torch_geometric.loader import DataLoader
+import numpy as np
+
 
 class EGSCTrainer(object):
     def __init__(self, args):
@@ -107,7 +113,82 @@ class EGSCTrainer(object):
         # for g in self.training_graphs + self.testing_graphs + (self.synth_data_1 + self.synth_data_2 if self.args.synth else []):
         #     max_node_number = max(max_node_number, int(degree(g.num_nodes).max().item()))
         # print(max_node_number)
+        def feature_augmentation(dataset):
+            print('dataset', dataset)
+            copy_dataset = Data.clone(dataset)
+            temp_dataset = []
 
+            for idx, graph_item in enumerate(copy_dataset):
+                edge_index = graph_item.edge_index
+                size = graph_item.x.shape[0]
+                node_degree = list(repeat(0, size))
+                aug_feature_list = []
+                queue = []
+                visited = {}
+
+                # print('edge_index', edge_index)
+                # print('graph_item.x',  graph_item.x)
+
+                [graph_adj1, graph_adj2] = edge_index.numpy()
+                # adj = [[] for i in range(size)]
+               
+                # def addEdge(adj: list, u, v):
+                #     adj[u].append(v)
+                
+                # for idx in range (0, len(graph_adj1)):
+                #     addEdge(adj, graph_adj1[idx], graph_adj2[idx])
+
+
+                w, h = size, size
+                full_adj = [[0 for x in range(w)] for y in range(h)] 
+                for idx in range (0, len(graph_adj1)):
+                    full_adj[graph_adj1[idx]][graph_adj2[idx]] = 1
+
+                A = np.array(full_adj)
+
+                # number of nodes in the graph
+                # n = A.shape[0]
+
+                for node_idx in range(0, size):
+                    temp_list = [0 for i in range(11) ]
+                    aug_feature_list.append(temp_list)
+                
+
+                #print('aug_feature_list shape', aug_feature_list.shape)
+
+                # calculate the counts of cycles of length k up to a maximum length of max_k
+                max_k = 10
+                #cycle_counts = np.zeros((max_k,))
+
+                for k in range(3, max_k+1):
+                    Ak = np.linalg.matrix_power(A, k)
+                    # print('---')
+                    # print('k',k)
+                    # print(Ak)
+                    for j in range(0, len(Ak)):
+                        if(Ak[j][j] > 0):
+                            aug_feature_list[j][k] = 1
+                    # print('---')
+                    #cycle_counts[k-1] = np.trace(Ak) // (2*k)
+
+
+                #print('aug_feature_list', aug_feature_list)
+
+             
+                # print('aug_feature_list', aug_feature_list)
+                #aug_feature_list = torch.FloatTensor(aug_feature_list)
+                aug_feature_list = torch.tensor(aug_feature_list)
+                #print('----')
+                #print('graph_item.x', graph_item.x.shape)
+                #print('aug_feature_list', aug_feature_list.shape)
+                # graph_item.x = graph_item.x + aug_feature_list
+                # graph_item.x = graph_item.x + aug_feature_list
+                graph_item.x = torch.cat((graph_item.x, aug_feature_list), 1)
+                #print('graph_item.x', graph_item.x.shape)
+                #print(''graph_item.x', 'graph_item.x')
+                #print('----')
+                temp_dataset.append(graph_item)
+            return temp_dataset
 
         if self.training_graphs[0].x is None:
             max_degree = 0
@@ -119,6 +200,10 @@ class EGSCTrainer(object):
             self.training_graphs.transform = one_hot_degree
             self.testing_graphs.transform = one_hot_degree
         
+        if self.args.feature_aug != 0:
+            self.training_graphs = feature_augmentation(self.training_graphs)
+            self.testing_graphs = feature_augmentation(self.testing_graphs)
+
         # labeling of synth data according to real data format    
             if self.args.synth:
                 for g in self.synth_data_1 + self.synth_data_2:
@@ -128,7 +213,8 @@ class EGSCTrainer(object):
             for g in self.synth_data_1 + self.synth_data_2:
                 g.i = g.i + real_data_size
                     
-        self.number_of_labels = self.training_graphs.num_features
+        # self.number_of_labels = self.training_graphs.num_features
+        number_of_labels = self.testing_graphs[0].x.shape[-1]
 
     def create_batches(self):
         """
