@@ -311,9 +311,9 @@ def feature_augmentation(dataset, feature_aug_options):
         
         # method 1: fast identity GIN
         if feature_aug_options == 1: # save if a route exitst
-        # calculate the counts of length k up to a maximum length of max_k
-            max_k = min(10, size)
-            for k in range(3, max_k+1):
+        # calculate the existence of length k up to a maximum length of max_k
+            max_k = 10
+            for k in range(1, max_k+1):
                 Ak = np.linalg.matrix_power(A, k)
 
                 for j in range(0, len(Ak)):
