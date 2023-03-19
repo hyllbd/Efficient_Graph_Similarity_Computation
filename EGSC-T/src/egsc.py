@@ -99,10 +99,10 @@ class EGSCTrainer(object):
             synth_nged_matrix = torch.cat((torch.full((synth_data_size, real_data_size), float('inf')), synth_nged_matrix), dim=1)
             self.nged_matrix = torch.cat((self.nged_matrix, synth_nged_matrix))
         
-        max_node_number = 0
-        for g in self.training_graphs + self.testing_graphs + (self.synth_data_1 + self.synth_data_2 if self.args.synth else []):
-            max_node_number = max(max_node_number, int(degree(g.num_nodes).max().item()))
-        print(max_node_number)
+        # max_node_number = 0
+        # for g in self.training_graphs + self.testing_graphs + (self.synth_data_1 + self.synth_data_2 if self.args.synth else []):
+        #     max_node_number = max(max_node_number, int(degree(g.num_nodes).max().item()))
+        # print(max_node_number)
 
 
         if self.training_graphs[0].x is None:
