@@ -102,7 +102,8 @@ class EGSCTrainer(object):
             if self.args.feature_aug == 0:
                 self.synth_data_1, self.synth_data_2, _, synth_nged_matrix = gen_pairs(self.training_graphs.shuffle()[:500], 0, 3)  
             else:
-                self.synth_data_1, self.synth_data_2, _, synth_nged_matrix = gen_pairs(random.shuffle(self.training_graphs)[:500], 0, 3)  
+                random.shuffle(self.training_graphs)
+                self.synth_data_1, self.synth_data_2, _, synth_nged_matrix = gen_pairs(self.training_graphs[:500], 0, 3)  
             real_data_size = self.nged_matrix.size(0)
             synth_data_size = synth_nged_matrix.size(0)
             self.nged_matrix = torch.cat((self.nged_matrix, torch.full((real_data_size, synth_data_size), float('inf'))), dim=1)
@@ -230,9 +231,12 @@ class EGSCTrainer(object):
             target_loader = DataLoader(self.training_graphs.shuffle() + 
                 ([self.synth_data_2[i] for i in synth_data_ind] if self.args.synth else []), batch_size=self.args.batch_size)
         else:
-            source_loader = DataLoader(random.shuffle(self.training_graphs) + 
+            print('type', type(self.training_graphs))
+            random.shuffle(self.training_graphs)
+            source_loader = DataLoader(self.training_graphs + 
                 ([self.synth_data_1[i] for i in synth_data_ind] if self.args.synth else []), batch_size=self.args.batch_size)
-            target_loader = DataLoader(random.shuffle(self.training_graphs) + 
+            random.shuffle(self.training_graphs)
+            target_loader = DataLoader(self.training_graphs + 
                 ([self.synth_data_2[i] for i in synth_data_ind] if self.args.synth else []), batch_size=self.args.batch_size)
         
         return list(zip(source_loader, target_loader))
@@ -313,9 +317,13 @@ class EGSCTrainer(object):
                             scores[i] = F.mse_loss(prediction, target, reduction='none').detach()
                             t.update(cnt_train)
                     else:
-                        for i, g in enumerate(random.shuffle(self.testing_graphs[:cnt_test])):
+                        temp1 = self.testing_graphs[:cnt_test]
+                        random.shuffle(temp1)
+                        for i, g in enumerate(temp1):
                             source_batch = Batch.from_data_list([g]*cnt_train)
-                            target_batch = Batch.from_data_list(random.shuffle(self.training_graphs[:cnt_train]))
+                            temp2 = self.training_graphs[:cnt_train]
+                            random.shuffle(temp2)
+                            target_batch = Batch.from_data_list(temp2)
                             data = self.transform((source_batch, target_batch))
                             target = data["target"]
                             prediction = self.model_c(self.model_g(data)) # why???
