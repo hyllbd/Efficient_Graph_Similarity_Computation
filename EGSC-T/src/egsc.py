@@ -26,7 +26,11 @@ from itertools import repeat
 from torch_geometric.data import Data
 from torch_geometric.loader import DataLoader
 import numpy as np
+import random
 
+torch.manual_seed(0)
+random.seed(0)
+np.random.seed(0)
 
 class EGSCTrainer(object):
     def __init__(self, args):
@@ -180,7 +184,7 @@ class EGSCTrainer(object):
                                 aug_feature_list[j][k] = float(min(round(Ak[j][j] / (2*size), 2), 1))
 
 
-                elif self.args.feature_aug == 3: # only count triangles
+                elif self.args.feature_aug == 3: # only count the number of triangles
                     max_k = 3
 
                     for k in range(3, max_k+1):
