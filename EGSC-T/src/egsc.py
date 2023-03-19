@@ -104,7 +104,7 @@ class EGSCTrainer(object):
             else:
                 # random.shuffle(self.training_graphs)
                 perm = torch.randperm(len(self.training_graphs))
-                temp_dataset = self.training_graphs[perm]
+                temp_dataset = self.training_graphs(perm)
                 self.synth_data_1, self.synth_data_2, _, synth_nged_matrix = gen_pairs(temp_dataset[:500], 0, 3)  
             real_data_size = self.nged_matrix.size(0)
             synth_data_size = synth_nged_matrix.size(0)
@@ -249,12 +249,12 @@ class EGSCTrainer(object):
         else:
             print('type', type(self.training_graphs))
             perm = torch.randperm(len(self.training_graphs))
-            temp_dataset = self.training_graphs[perm]
+            temp_dataset = self.training_graphs(perm)
             # random.shuffle(self.training_graphs)
             source_loader = DataLoader(temp_dataset + 
                 ([self.synth_data_1[i] for i in synth_data_ind] if self.args.synth else []), batch_size=self.args.batch_size)
             perm = torch.randperm(len(self.training_graphs))
-            temp_dataset = self.training_graphs[perm]
+            temp_dataset = self.training_graphs(perm)
             # random.shuffle(self.training_graphs)
             target_loader = DataLoader(temp_dataset + 
                 ([self.synth_data_2[i] for i in synth_data_ind] if self.args.synth else []), batch_size=self.args.batch_size)
