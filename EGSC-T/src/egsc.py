@@ -169,6 +169,7 @@ class EGSCTrainer(object):
                         for j in range(0, len(Ak)):
                             if(Ak[j][j] > 0):
                                 aug_feature_list[j][k] = 1
+                
                 elif self.args.feature_aug == 2: # save the count of routes
                     max_k = min(10, size)
                     for k in range(3, max_k+1):
@@ -176,7 +177,7 @@ class EGSCTrainer(object):
 
                         for j in range(0, len(Ak)):
                             if(Ak[j][j] > 0):
-                                aug_feature_list[j][k] = min(round(Ak[j][j] / (2*size)),1)
+                                aug_feature_list[j][k] = min(round(Ak[j][j] / (2*size), 2), 1)
 
 
                 elif self.args.feature_aug == 3: # only count triangles
