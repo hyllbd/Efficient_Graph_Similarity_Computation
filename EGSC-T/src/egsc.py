@@ -43,7 +43,7 @@ class EGSCTrainer(object):
         self.best_model_error = float('inf')
 
         print('self.args.feature_aug', self.args.feature_aug)
-
+        print('self.args.dataset', self.args.dataset)
 
     def setup_model(self):
         """
@@ -157,9 +157,17 @@ class EGSCTrainer(object):
                 
                 # method 1: fast identity GIN
                 if self.args.feature_aug == 1:
-                # calculate the counts of cycles of length k up to a maximum length of max_k
+                # calculate the counts of length k up to a maximum length of max_k
                     max_k = min(10, size)
-                    #cycle_counts = np.zeros((max_k,))
+                    for k in range(3, max_k+1):
+                        Ak = np.linalg.matrix_power(A, k)
+
+                        for j in range(0, len(Ak)):
+                            if(Ak[j][j] > 0):
+                                aug_feature_list[j][k] = 1
+
+                elif self.args.feature_aug == 2: # only count triangles
+                    max_k = 3
 
                     for k in range(3, max_k+1):
                         Ak = np.linalg.matrix_power(A, k)
@@ -168,10 +176,7 @@ class EGSCTrainer(object):
                         # print(Ak)
                         for j in range(0, len(Ak)):
                             if(Ak[j][j] > 0):
-                                aug_feature_list[j][k] = 1
-                        # print('---')
-                        #cycle_counts[k-1] = np.trace(Ak) // (2*k)
-
+                                aug_feature_list[j][k] = Ak[j][j] // (2*size)
 
                 #print('aug_feature_list', aug_feature_list)
 
