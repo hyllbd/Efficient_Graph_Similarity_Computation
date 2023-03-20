@@ -168,12 +168,12 @@ class EGSCTrainer(object):
             target_loader = DataLoader(self.training_graphs.shuffle() + 
                 ([self.synth_data_2[i] for i in synth_data_ind] if self.args.synth else []), batch_size=self.args.batch_size)
         else:
-            print('before',self.training_graphs[0])
+            print('before self.training_graphs[0]',self.training_graphs[0])
             temp_dataset_shuffle_1 = copy.deepcopy(self.training_graphs)
-            print('before',temp_dataset_shuffle_1[0])
+            print('before temp_dataset_shuffle_1[0]',temp_dataset_shuffle_1[0])
             random.Random(1).shuffle(temp_dataset_shuffle_1)
-            print('after',temp_dataset_shuffle_1[0])
-            print('after', self.training_graphs[0])
+            print('after temp_dataset_shuffle_1[0]',temp_dataset_shuffle_1[0])
+            print('after self.training_graphs[0]', self.training_graphs[0])
             source_loader = DataLoader(temp_dataset_shuffle_1 + 
                 ([self.synth_data_1[i] for i in synth_data_ind] if self.args.synth else []), batch_size=self.args.batch_size)
             temp_dataset_shuffle_2 = copy.deepcopy(self.training_graphs)
@@ -239,6 +239,7 @@ class EGSCTrainer(object):
         loss_list_test = []
         for epoch in epochs:
             
+            print('self.args.plot', self.args.plot)
             if self.args.plot:
                 if epoch % 10 == 0:
                     self.model_g.train(False)
