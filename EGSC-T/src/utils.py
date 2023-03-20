@@ -425,7 +425,7 @@ def feature_augmentation(dataset, feature_aug_options):
                 max_k = 10
                 temp_res_list = cal_circle_BFS(node_idx, adj, size, max_k) # all the existence circles with various length
                 for k in temp_res_list:
-                    aug_feature_list[j][k] = 1 # 1 represents exist
+                    aug_feature_list[node_idx][k] = 1 # 1 represents exist
                 
                 # aug_feature_list.append([temp])
 
