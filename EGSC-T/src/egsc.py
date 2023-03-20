@@ -109,7 +109,7 @@ class EGSCTrainer(object):
                 # perm = torch.randperm(len(self.training_graphs))
                 # temp_dataset = self.training_graphs(perm)
                 temp_dataset_shuffle = copy.deepcopy(self.training_graphs)
-                random.Random(0).shuffle(temp_dataset_shuffle)
+                random.shuffle(temp_dataset_shuffle)
                 self.synth_data_1, self.synth_data_2, _, synth_nged_matrix = gen_pairs(temp_dataset_shuffle[:500], 0, 3)  
             real_data_size = self.nged_matrix.size(0)
             synth_data_size = synth_nged_matrix.size(0)
@@ -171,7 +171,7 @@ class EGSCTrainer(object):
             print('before self.training_graphs[0]',self.training_graphs[0])
             temp_dataset_shuffle_1 = copy.deepcopy(self.training_graphs)
             print('before temp_dataset_shuffle_1[0]',temp_dataset_shuffle_1[0])
-            random.Random(1).shuffle(temp_dataset_shuffle_1)
+            random.shuffle(temp_dataset_shuffle_1)
             print('after temp_dataset_shuffle_1[0]',temp_dataset_shuffle_1[0])
             print('after self.training_graphs[0]', self.training_graphs[0])
             source_loader = DataLoader(temp_dataset_shuffle_1 + 
@@ -180,7 +180,7 @@ class EGSCTrainer(object):
             print('before self.training_graphs[0]',self.training_graphs[0])
             temp_dataset_shuffle_2 = copy.deepcopy(self.training_graphs)
             print('before temp_dataset_shuffle_2[0]',temp_dataset_shuffle_2[0])
-            random.Random(200).shuffle(temp_dataset_shuffle_2)
+            random.shuffle(temp_dataset_shuffle_2)
             print('after temp_dataset_shuffle_2[0]',temp_dataset_shuffle_2[0])
             print('after self.training_graphs[0]', self.training_graphs[0])
 
@@ -267,11 +267,11 @@ class EGSCTrainer(object):
                             t.update(cnt_train)
                     else:
                         temp1 = copy.deepcopy(self.testing_graphs[:cnt_test])
-                        random.Random(3).shuffle(temp1)
+                        random.shuffle(temp1)
                         for i, g in enumerate(temp1):
                             source_batch = Batch.from_data_list([g]*cnt_train)
                             temp2 = copy.deepcopy(self.training_graphs[:cnt_train])
-                            random.Random(4).shuffle(temp2)
+                            random.shuffle(temp2)
                             target_batch = Batch.from_data_list(temp2)
                             data = self.transform((source_batch, target_batch))
                             target = data["target"]
