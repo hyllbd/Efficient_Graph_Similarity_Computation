@@ -160,15 +160,17 @@ class EGSCTrainer(object):
             synth_data_ind = random.sample(range(len(self.synth_data_1)), 100)
         
         if self.args.feature_aug == -1:
+            print('before',self.training_graphs[0])
             source_loader = DataLoader(self.training_graphs.shuffle() + 
                 ([self.synth_data_1[i] for i in synth_data_ind] if self.args.synth else []), batch_size=self.args.batch_size)
+            print('after',self.training_graphs[0])
             target_loader = DataLoader(self.training_graphs.shuffle() + 
                 ([self.synth_data_2[i] for i in synth_data_ind] if self.args.synth else []), batch_size=self.args.batch_size)
         else:
-            print('before',self.training_graphs[0].x)
+            print('before',self.training_graphs[0])
             temp_dataset_shuffle_1 = copy.deepcopy(self.training_graphs)
             random.Random(1).shuffle(temp_dataset_shuffle_1)
-            print('after', self.training_graphs[0].x)
+            print('after', self.training_graphs[0])
             source_loader = DataLoader(temp_dataset_shuffle_1 + 
                 ([self.synth_data_1[i] for i in synth_data_ind] if self.args.synth else []), batch_size=self.args.batch_size)
             temp_dataset_shuffle_2 = copy.deepcopy(self.training_graphs)
