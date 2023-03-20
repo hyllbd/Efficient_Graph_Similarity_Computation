@@ -161,6 +161,7 @@ class EGSCTrainer(object):
         
         if self.args.feature_aug == -1:
             print('before',self.training_graphs[0])
+            print('before',self.training_graphs.shuffle()[0])
             source_loader = DataLoader(self.training_graphs.shuffle() + 
                 ([self.synth_data_1[i] for i in synth_data_ind] if self.args.synth else []), batch_size=self.args.batch_size)
             print('after',self.training_graphs[0])
