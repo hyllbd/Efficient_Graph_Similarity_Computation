@@ -428,6 +428,8 @@ def feature_augmentation(dataset, feature_aug_options):
                     aug_feature_list[node_idx][k] = 1 # 1 represents exist
                 
                 # aug_feature_list.append([temp])
+            
+            print('our method aug_feature_list', aug_feature_list)
 
 
         aug_feature_list = torch.tensor(aug_feature_list)
