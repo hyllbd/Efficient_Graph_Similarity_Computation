@@ -1,8 +1,6 @@
 
 # net=gin
-# net=mpnn
 net=ginmp
-# net=ginskip
 
 epochs=10
 bs=128
@@ -11,7 +9,7 @@ wb=0            # 1:use wandb, 0:not use wandb
 cudaid=0
 testinterval=10
 
-# ******************************************** temp test ********************************************
+# ******************************************** train and test ********************************************
 dataset='AIDS700nef'
 python -u src/main.py --dataset $dataset --gnn-operator $net --epochs $epochs --batch-size $bs --learning-rate $lr --plot --wandb $wb --cuda-id=$cudaid --test-interval $testinterval \
 # > 'logs/train.log' 2>&1
