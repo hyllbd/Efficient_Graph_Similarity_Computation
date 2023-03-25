@@ -7,13 +7,13 @@ from torch.nn.init import _calculate_correct_fan, calculate_gain
 from torch_geometric.nn import global_mean_pool, global_add_pool, global_max_pool, MessagePassing
 import math
 
-def map_x_to_u(x, batch_info): # 这个函数具体流程：将x的特征映射到初始的局部上下文中，然后将u和u_x拼接起来，作为最终的u。u全称是local context
+def map_x_to_u(x, batch_info): 
     """ map the node features to the right row of the initial local context.""" 
     # x = data.x
     num_nodes = x.shape[0]
     u = x.new_zeros((num_nodes, batch_info['n_colors'])) # u: num_nodes x n_colors e.g. 39 x 23
-    u.scatter_(1, batch_info['coloring'], 1) # 将u的第二维度的元素，按照data.coloring的值进行赋值，比如data.coloring的第一个元素是3，那么u的第一个元素的第三个元素就是1，其他元素都是0
-    u = u[..., None] # 增加一个维度，变成num_nodes x n_colors x 1  [..., None]的意思是在最后增加一个维度，None代表的是增加一个维度，而不是增加一个元素。比如[1, 2, 3]变成[1, 2, 3, None]
+    u.scatter_(1, batch_info['coloring'], 1) 
+    u = u[..., None] 
     
     u_x = u.new_zeros((u.shape[0], u.shape[1], x.shape[1])) # num_nodes x n_colors x n_features
 
@@ -21,18 +21,17 @@ def map_x_to_u(x, batch_info): # 这个函数具体流程：将x的特征映射�
     coloring = batch_info['coloring']       # num_nodes x 1
     expanded_colors = coloring[..., None].expand(-1, -1, n_features) # num_nodes x 1 x n_features
 
-    u_x = u_x.scatter_(dim=1, index=expanded_colors, src=x[:, None, :]) # num_nodes x n_colors x n_features 将x的特征映射到初始的局部上下文中
+    u_x = u_x.scatter_(dim=1, index=expanded_colors, src=x[:, None, :]) # num_nodes x n_colors x n_features 
     
     # print('\n[map_x_to_u] u_x.shape:', u_x.shape, ', u.shape:', u.shape, ', expanded_colors.shape:', expanded_colors.shape)
     # u_x.shape:  torch.Size([num_nodes, n_colors, n_features]) , u.shape:  torch.Size([num_nodes, n_colors, 1]) , expanded_colors.shape: torch.Size([39, 1, 1])
     
-    # u 代表了局部上下文，u_x代表了局部上下文中的节点特征，将u和u_x拼接起来，作为最终的u
     u = torch.cat((u, u_x), dim=2) # u.shape: torch.Size([num_nodes, n_colors, 2])
     # print('[map_x_to_u] final return u.shape:', u.shape)
     return u
 
-# def create_batch_info(data, edge_counter): # 计算一些关于batch的信息，然后将这些信息封装成一个字典
-def create_batch_info(edge_index, x, batch, graph_index, edge_attr, edge_counter): # 计算一些关于batch的信息，然后将这些信息封装成一个字典
+# def create_batch_info(data, edge_counter): 
+def create_batch_info(edge_index, x, batch, graph_index, edge_attr, edge_counter): 
     """ Compute some information about the batch that will be used by SMP."""
     # x, edge_index, batch, batch_size = data.x, edge_index, data.batch, data.num_graphs
     
@@ -47,7 +46,7 @@ def create_batch_info(edge_index, x, batch, graph_index, edge_attr, edge_counter
     n_batch = torch.zeros_like(batch, dtype=torch.float) # num_nodes x 1
 
     for value, n in zip(unique, n_per_graph):
-        n_batch[batch == value] = n.float()  # n_batch 是一个向量，每个元素代表了对应的节点所在的图的节点数，比如第一个元素是3，代表了第一个节点所在的图有3个节点
+        n_batch[batch == value] = n.float()  
 
     # Count the average number of edges per graph
     num_nodes = x.shape[0]
@@ -73,16 +72,16 @@ def create_batch_info(edge_index, x, batch, graph_index, edge_attr, edge_counter
         mask[batch == value, :n] = True
 
     # Aggregate into a dict
-    batch_info = {'num_nodes': num_nodes,      # batch里面的节点总数, 直接从data获得
+    batch_info = {'num_nodes': num_nodes,      
                 #   'num_graphs': data.num_graphs, 
-                  'num_graphs': batch_size,         # batch里面的图的总数, 直接从data获得
-                  'batch': batch,              # batch里面每个节点的图的编号, 直接从data获得
-                  'n_per_graph': n_per_graph,       # batch里面每个图的节点数， 通过 torch.unique 计算得到
-                  'n_batch': n_batch[:, None, None].float(),  # 每个元素代表了对应的节点所在的图的节点数，比如第一个元素是3，代表了第一个节点所在的图有3个节点
-                  'average_edges': average_edges[:, :, None], # 每个元素代表了对应的节点所在的图的平均边数
-                  'coloring': coloring,        # batch里面每个节点的颜色编号
-                  'n_colors': n_colors,             # batch里面的颜色总数
-                  'mask': mask      # Used because of batching - it tells which entries of u are not used by the graph # 用于batching，因为batching之后，u的大小会变大，但是实际上有些节点是没有用到的，这个mask就是用来标记哪些节点是没有用到的
+                  'num_graphs': batch_size,         
+                  'batch': batch,              
+                  'n_per_graph': n_per_graph,       
+                  'n_batch': n_batch[:, None, None].float(),  
+                  'average_edges': average_edges[:, :, None], 
+                  'coloring': coloring,        
+                  'n_colors': n_colors,             
+                  'mask': mask      # Used because of batching - it tells which entries of u are not used by the graph 
                   }
     return batch_info
 
@@ -105,7 +104,7 @@ class EdgeCounter(MessagePassing):
     def __init__(self):
         super().__init__(aggr='add')
 
-    def forward(self, x, edge_index, batch, batch_size): # 原理是通过对每个节点的邻居节点进行求和，然后除以节点数，得到平均边数，e.g. 5个节点的图，每个节点有3个邻居，那么平均边数就是3 (邻居数总和:15/节点数:5=3)
+    def forward(self, x, edge_index, batch, batch_size): 
         n_edges = self.propagate(edge_index, size=(x.size(0), x.size(0)), x=x)
         return global_mean_pool(n_edges, batch, batch_size)[batch] # global_mean_pool
 
@@ -119,7 +118,7 @@ def pooling(x: torch.Tensor, batch_info, method):
     if method == 'add':
         return global_add_pool(x, batch_info['batch'], batch_info['num_graphs'])
     elif method == 'mean':
-        return global_mean_pool(x, batch_info['batch'], batch_info['num_graphs']) # global_mean_pool 会对每个图的节点进行求平均
+        return global_mean_pool(x, batch_info['batch'], batch_info['num_graphs']) 
     elif method == 'max':
         return global_max_pool(x, batch_info['batch'], batch_info['num_graphs'])
     else:
@@ -190,7 +189,7 @@ class UtoGlobal(nn.Module):
         
         # Extract trace
         index_tensor = coloring[:, :, None].expand(u.shape[0], 1, u.shape[2])
-        extended_diag = u.gather(1, index_tensor)[:, 0, :]          # n_nodes, in_feat  # 从u中取出对角线上的元素, 也就是每个节点的颜色
+        extended_diag = u.gather(1, index_tensor)[:, 0, :]          # n_nodes, in_feat  
         # mean_batch_trace = pooling(extended_diag, batch_info, 'mean')    # n_graphs, in_feat
         # out1 = self.lin1(mean_batch_trace)                   # bs, out_feat
         # print('[UtoGlobal] extended_diag.shape:', extended_diag.shape, ' mean_batch_trace.shape:', mean_batch_trace.shape, ' out1.shape:', out1.shape)
@@ -216,7 +215,7 @@ class GraphExtractor(nn.Module):
         # print('[GraphExtractor] cuda_id: ', cuda_id)
         self.extractor = (XtoGlobal if self.use_x else UtoGlobal)(in_features, out_features, True, 1, cuda_id) # use_x=False
         # XtoGlobal: g = global_mean_pool(x, batch_info, method="mean")
-        # pooling = global_mean_pool(x, batch_info['batch'], batch_info['num_graphs']) # global_mean_pool是将每个batch的数据求平均 Returns batch-wise graph-level-outputs by averaging node features across the node dimension
+        # pooling = global_mean_pool(x, batch_info['batch'], batch_info['num_graphs']) 
         device = torch.device('cuda:{}'.format(cuda_id) if torch.cuda.is_available() else 'cpu')
         self.lin = nn.Linear(out_features, out_features).to(device)
 
@@ -260,7 +259,7 @@ class EntrywiseU(nn.Module):
 
     def forward(self, u):
         """ u: N x colors x channels. """
-        u = u.transpose(1, 2) # transpose 是将矩阵转置
+        u = u.transpose(1, 2) # transpose
         u = self.lin1(u)
         return u.transpose(1, 2)
 
@@ -330,49 +329,28 @@ class SMPLayer(MessagePassing):
         self.update2 = nn.Linear(out_features, out_features).to(device)
 
     def forward(self, u, edge_index, edge_attr, batch_info):
-        n = batch_info['num_nodes'] # n = 节点数
-        # print('\n[SMPLayer] 输入 u.shape:', u.shape, ' edge_index.shape:', edge_index.shape, ' edge_attr.shape:', edge_attr.shape)
-        # 输入 u.shape:  torch.Size([num_nodes, n_colors=23, output_features=32])  edge_index.shape:  torch.Size([2, 82])  edge_attr.shape:  torch.Size([82, 1])
+        n = batch_info['num_nodes'] # n = 
         
         u = self.message_nn(u, batch_info) 
-        # print('[SMPLayer] message_nn 输出 u.shape:', u.shape)
-        #  u.shape:  torch.Size([39, 23, 32]) 即message_nn不改变u的维度
-        # message_nn: UtoU
         
-        # 操作: transpose + linear
         u1 = self.order2_i(u)
         u2 = self.order2_j(u)
-        # print('[SMPLayer] u1.shape:', u1.shape, ' u2.shape:', u2.shape)
-        # u1.shape:  torch.Size([39, 23, 32])  u2.shape:  torch.Size([39, 23, 32]) 即order2_i和order2_j不改变u的维度
         
-        # 操作：propagate是继承的父类MessagePassing的方法，用于计算消息传递，即计算消息传递的结果， Calling this function will consequently call message and update.  参考：https://towardsdatascience.com/hands-on-graph-neural-networks-with-pytorch-pytorch-geometric-359487e221a8
         new_u = self.propagate(edge_index, size=(n, n), u=u, u1=u1, u2=u2, edge_attr=edge_attr)
-        # print('[SMPLayer] propagate 输出 new_u.shape:', new_u.shape)
-        # propagate 输出 new_u.shape:  torch.Size([39, 23, 32]) 即propagate不改变u的维度
         
-        # 操作：new_u = new_u / 节点对应的图的平均边数
         new_u /= batch_info['average_edges'][:, :, 0] if self.use_x else batch_info['average_edges'] # use_x = False
-        # new_u /= batch_info['average_edges'] # average_edges 含义：[num_nodes, 1, 1] 每个元素代表了对应的节点所在的图的平均边数，比如第一个元素是2.1250，代表了第一个节点所在的图的平均边数为2.1250 因此前16个元素的值都为2.1250，后23个元素的值都为2.0870
-        # print('[SMPLayer] final return new_u.shape:', new_u.shape) 
-        # final return new_u.shape:  torch.Size([39, 23, 32]) 即最终返回的new_u不改变u的维度
         return new_u
 
     # Constructs messages from node j to node i
     def message(self, u_j, u1_i, u2_j, edge_attr):
-        # 操作：nn.Linear(edge_features, out_features)
-        
-        # edge_feat = self.edge_nn(edge_attr) if self.use_edge_features else 0
         edge_feat = self.edge_nn(edge_attr) if self.use_edge_features else torch.zeros(1) # use_edge_features = False
         
         if not self.use_x: # use_x = False
-            edge_feat = edge_feat.unsqueeze(1) # 维度扩展，即增加一个维度，维度值为1
+            edge_feat = edge_feat.unsqueeze(1)
         
-        # 操作：transpose + linear
         edge_feat = edge_feat.to(u1_i.device)
-        # print('order2.device:', next(self.order2.parameters()).device, ', u1_i.device:', u1_i.device, ', u2_j.device:', u2_j.device, ', edge_feat.device:', edge_feat.device)
         order2 = self.order2(torch.relu(u1_i + u2_j + edge_feat))
         
-        # 操作：相加
         u_j = u_j + order2
         
         return u_j
@@ -453,7 +431,6 @@ class SMPModel(nn.Module):
         2. no pre_transform
         [SMPModel] input data.__dict__.keys():  dict_keys(['edge_index', 'x', 'y', 'num_nodes', 'batch'])
         [SMPModel] input data:  <lab1_task1_5_1_6.Graph object at 0x1494c98daf10> , data.x.shape: torch.Size([2998, 1]) , self.edge_index.shape: torch.Size([2, 6456]) , data.y.shape: torch.Size([128]) , data.batch.shape: torch.Size([2998]) , data.edge_attr.shape: torch.Size([6456, 1])
-        备注：经过对比，我们这里得到的 data.batch 和 message_passing/SMP/models/model_zinc.py 里class SMPZinc.forward() 输入参数data.batch是相同的，shape和含义都相同
         """
         # [SMPModel] input data:  <lab1_task1_5_1_6.Graph object at 0x1483b440cb80> , 
         # data.x.shape: torch.Size([39, 1]) , self.edge_index.shape: torch.Size([2, 82]) , data.y.shape: torch.Size([2]) , 
@@ -461,9 +438,7 @@ class SMPModel(nn.Module):
         if edge_attr is None:
             edge_attr = torch.ones((self.edge_index.shape[1], 1), dtype=torch.float32, device=self.x.device) # edge_attr: [num_edges, 1]
         # print('[SMPModel] edge_attr.shape:', edge_attr.shape, ', edge_attr[:3]:', edge_attr[:3])
-        
 
-        # print('\n边计数器 self.edge_counter:', self.edge_counter)
 
         # Compute information about the batch
         batch_info = create_batch_info(self.edge_index, self.x, self.batch, self.graph_index, self.edge_attr, self.edge_counter)
@@ -477,101 +452,36 @@ class SMPModel(nn.Module):
         # print('batch_info["n_colors"]:', batch_info['n_colors'])
         # print('batch_info["mask"].shape:', batch_info['mask'].shape)
         # print('batch_info["mask"].shape:', batch_info['mask'].shape, ', batch_info["mask"][0]:', batch_info['mask'][0], ', batch_info["mask"][15]:', batch_info['mask'][15], ', batch_info["mask"][16]:', batch_info['mask'][16], ', batch_info["mask"][38]:', batch_info['mask'][38])
-        '''
-        遍历前 batch_info: {
-                    'num_nodes': 39, 
-                    'num_graphs': 2, 
-                    'batch': tensor([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]), 
-                    'n_per_graph': tensor([16, 23]),  # 每个图的节点数，即第一个图有16个节点，第二个图有23个节点
-                    'n_batch': tensor([ [[16.]], [[16.]], [[16.]],  ... [[23.]]]),  # 每个元素代表了对应的节点所在的图的节点数，比如第一个元素是3，代表了第一个节点所在的图有3个节点
-                    'average_edges': tensor([ [[2.1250]], [[2.1250]], [[2.1250]] ... [[2.0870]], [[2.0870]], [[2.0870]]]), # 前16个元素的值都为2.1250，后23个元素的值都为2.0870
-                    'coloring': tensor([[ 0], [ 1], ... [ 15], [0], [1], ... [21], [22]]),  # 从0递增到15 然后从0递增到22 前16个节点(第一个图)的颜色从0到15，后23个节点的颜色从0到22(第二个图)
-                    'n_colors': tensor(23), 
-                    'mask': tensor([[ True,  True,  True,  True,  True,  True,  True,  True,  True,  True, True,  True,  True,  True,  True,  True, False, False, False, False, False, False, False],
-                                    [....],
-                                    [ True,  True,  True,  True,  True,  True,  True,  True,  True,  True, True,  True,  True,  True,  True,  True,  True,  True,  True,  True, True,  True,  True]])
-                }
-        n_per_graph 含义：[num_graphs] 每个元素代表了对应的图的节点数，比如第一个元素是16，代表了第一个图有16个节点
-        n_batch 含义：[num_nodes, 1] 每个元素代表了对应的节点所在的图的节点数，比如第一个元素是3，代表了第一个节点所在的图有3个节点 一共有39个元素，前16个元素代表了第一个图的节点数，值都为16 后23个元素代表了第二个图的节点数，值都为23
-        average_edges 含义：[num_nodes, 1, 1] 每个元素代表了对应的节点所在的图的平均边数，比如第一个元素是2.1250，代表了第一个节点所在的图的平均边数为2.1250 因此前16个元素的值都为2.1250，后23个元素的值都为2.0870
-        coloring 含义：[num_nodes, 1] 每个元素代表了对应的节点的颜色，一共有39个元素，先从0递增到15 然后再从0递增到22 前16个节点(第一个图)的颜色从0到15，后23个节点的颜色从0到22(第二个图)
-        n_colors 含义：一个数，代表了整个batch里节点的颜色种类数，一共有23种颜色，计算方式：torch.max(data.coloring) + 1 最大的索引值+1，即22+1=23
-        mask 含义：[num_nodes, n_colors] 例如torch.Size([39, 23]) 每个元素代表了对应的节点是否属于对应的颜色，例如第一个节点的维度是torch.Size([23])，第一个元素是True，代表了第一个节点属于颜色0，第二个元素是False，代表了第一个节点不属于颜色1，第三个元素是True，代表了第一个节点属于颜色2，以此类推，最后一个元素是True，代表了第一个节点属于颜色22
-                  再举个例子，因为一共有39个节点，每个节点都对应一个23维度的向量，从打印信息发现，
-                    图1的节点：共16个节点
-                        第1个节点的23维度向量是[True * 16个, False * 7个]，代表了第一个节点属于颜色0到15，不属于颜色16到22 分析: 因为第一个节点属于图1，图1有16个节点，所以是前16个颜色
-                        第16个节点的23维度向量是[True * 16个, False * 7个]，代表了第15个节点属于颜色0到15，不属于颜色16到22 分析: 因为第15个节点属于图1，图1有16个节点，所以是前16个颜色
-                    图2的节点：共23个节点
-                        第17个节点的23维度向量是[True * 23个]，代表了第39个节点属于颜色0到22 分析: 因为第39个节点属于图2，图2有23个节点，所以是前23种颜色， 注意，图1和图2共用了前16种颜色
-                        第39个节点的23维度向量是[True * 23个]，代表了第39个节点属于颜色0到22 分析: 因为第39个节点属于图2，图2有23个节点，所以是前23种颜色， 注意，图1和图2共用了前16种颜色
-                    batch_info["mask"][0]:  tensor([ True,  True,  True,  True,  True,  True,  True,  True,  True,  True, True,  True,  True,  True,  True,  True, False, False, False, False, False, False, False]) , 
-                    batch_info["mask"][15]:  tensor([ True,  True,  True,  True,  True,  True,  True,  True,  True,  True, True,  True,  True,  True,  True,  True, False, False, False, False, False, False, False]) , 
-                    batch_info["mask"][16]:  tensor([True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True]) , 
-                    batch_info["mask"][38]:  tensor([True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True])
-        '''
+
         # Create the context matrix
         if self.use_x: # use_x=False
             assert self.x is not None
             u = self.x
         elif self.map_x_to_u: # map_x_to_u=True ✅
-            u = map_x_to_u(self.x, batch_info) # u代表的是节点的上下文特征，u.shape: torch.Size([num_nodes, n_colors, 2])
+            u = map_x_to_u(self.x, batch_info) 
         else:
             u = self.x.new_zeros((self.x.shape[0], batch_info['n_colors']))
             u.scatter_(1, batch_info['coloring'], 1)
             u = u[..., None]
-        # print('\n[Create the context matrix] u.shape:', u.shape)
+        
 
-        # Forward pass 
-        # 池化 + 线性层 (图特征提取器)
-        # print('[SMPModel.forward] u.device:', u.device, ', batch_info["mask"].device:', batch_info["mask"].device)
-        out = self.no_prop(u, batch_info) # out.shape: torch.Size([bs, 128])
-        # no_prop主要包含两个作用层: global_mean_pool + linear layer
-        # print('\ntype(out):', type(out), ', type(u):', type(u), ', type(batch_info):', type(batch_info)) # type(out): <class 'torch.Tensor'> , type(u): <class 'torch.Tensor'> , type(batch_info): <class 'dict'>
-        # print('\n[SMPModel] after no_prop, out.shape:', out.shape, ', u.shape:', u.shape) # 遍历前 out.shape: torch.Size([bs, 128]) , u.shape: torch.Size([num_nodes, n_colors, 2])
+        out = self.no_prop(u, batch_info) 
         
-        # 线性层 linear layer
-        u = self.initial_lin(u) # u.shape: torch.Size([num_nodes, n_colors, 32])
-        # (initial_lin): Linear(in_features=2, out_features=32, bias=True)
-        # print('[SMPModel] after initial_lin, u.shape:', u.shape) # u.shape: torch.Size([num_nodes, n_colors, 32=out_features])
+        u = self.initial_lin(u) 
         
-        # 遍历用到的信息: u, self.edge_index, edge_attr, batch_info
         for i in range(len(self.convs)): 
             conv = self.convs[i]
             extractor = self.feature_extractor
             bn = self.batch_norm_list[i] 
             
-            # batch norm layer 即正则化层
             if self.use_batch_norm and i > 0: # use_batch_norm = True
                 u = bn(u) 
-            # print('\n[SMPModel] after bn, u.shape:', u.shape)
             
-            # 卷积层
             u = conv(u, self.edge_index, edge_attr, batch_info) + 0
-            # print('\n[SMPModel] after conv, u.shape:', u.shape) # u.shape [num_nodes, n_colors, 32]
             
-            # extractor 提取特征 这一步会将u的维度从[num_nodes, n_colors, 32]变为[batch_size, hidden_final] e.g. [64, 128]
             global_features = extractor.forward(u, batch_info)
-            # print('[SMPModel] after extractor, global_features.shape:', global_features.shape)
             
-            # 全局特征 / len(self.convs)
             out += global_features / len(self.convs)
-            # print('[SMPModel] after out, out.shape:', out.shape)
-
-
-        # print('\n[SMPModel] after loop, out.shape:', out.shape, ', self.after_conv(out).shape:', self.after_conv(out).shape, ', torch.relu(self.after_conv(out)).shape:', torch.relu(self.after_conv(out)).shape)
-        # out.shape: torch.Size([bs, 128])
-        # self.after_conv(out).shape: torch.Size([bs, 128]), 维度不变
-        # torch.relu(self.after_conv(out)).shape: torch.Size([bs, 128]) 维度不变
-        
-        """ # 线性层 linear layer
-        out = self.final_lin(torch.relu(self.after_conv(out)) + out) 
-        # (after_conv): Linear(in_features=128, out_features=128, bias=True)
-        # (final_lin): Linear(in_features=128, out_features=1, bias=True)
-        assert out.shape[1] == 1
-        
-        # print('\n[SMPModel] 模型输出 out.shape=', out.shape, ', out[:, 0].shape=', out[:, 0].shape) #out.shape= torch.Size([bs, 1]) , out[:, 0].shape= torch.Size([bs])
-        # [:, 0]表示取第一列，e.g. shape为(128, 1)的tensor，取第一列后，shape变为(128,)
-        return out[:, 0] """
         
         return out
     

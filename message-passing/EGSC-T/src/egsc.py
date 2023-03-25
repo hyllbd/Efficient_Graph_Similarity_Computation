@@ -50,129 +50,8 @@ class EGSCTrainer(object):
         self.model_g.to(self.device)
         self.model_c.to(self.device)
         
-        self.get_parameter_number(self.model_g) # 模型参数，gin: total_num: 70070，trainable_num: 70070  smp(mpnn): Parameters total_num: 59827，trainable_num: 59827
-        self.get_parameter_number(self.model_c) # 模型参数，total_num: 17，trainable_num: 17
-        
-        # print(f'[EGSC-T/src/egsc.py] 正在执行setup_model函数 self.model_g={self.model_g}, self.model_c={self.model_c}')
-        """ [EGSC-T/src/egsc.py] 正在执行setup_model函数 self.model_g=EGSCT_generator(
-        (convolution_1): GINConv(nn=Sequential(
-            (0): Linear(in_features=29, out_features=64, bias=True)
-            (1): ReLU()
-            (2): Linear(in_features=64, out_features=64, bias=True)
-            (3): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-        ))
-        (convolution_2): GINConv(nn=Sequential(
-            (0): Linear(in_features=64, out_features=32, bias=True)
-            (1): ReLU()
-            (2): Linear(in_features=32, out_features=32, bias=True)
-            (3): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-        ))
-        (convolution_3): GINConv(nn=Sequential(
-            (0): Linear(in_features=32, out_features=16, bias=True)
-            (1): ReLU()
-            (2): Linear(in_features=16, out_features=16, bias=True)
-            (3): BatchNorm1d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-        ))
-        (attention_level3): AttentionModule(
-            (fc): Sequential(
-            (0): Linear(in_features=16, out_features=4, bias=True)
-            (1): ReLU(inplace=True)
-            (2): Linear(in_features=4, out_features=16, bias=True)
-            (3): Tanh()
-            )
-            (fc1): Linear(in_features=16, out_features=16, bias=True)
-        )
-        (attention_level2): AttentionModule(
-            (fc): Sequential(
-            (0): Linear(in_features=32, out_features=8, bias=True)
-            (1): ReLU(inplace=True)
-            (2): Linear(in_features=8, out_features=32, bias=True)
-            (3): Tanh()
-            )
-            (fc1): Linear(in_features=32, out_features=32, bias=True)
-        )
-        (attention_level1): AttentionModule(
-            (fc): Sequential(
-            (0): Linear(in_features=64, out_features=16, bias=True)
-            (1): ReLU(inplace=True)
-            (2): Linear(in_features=16, out_features=64, bias=True)
-            (3): Tanh()
-            )
-            (fc1): Linear(in_features=64, out_features=64, bias=True)
-        )
-        (tensor_network_level3): SETensorNetworkModule(
-            (fc_se): Sequential(
-            (0): Linear(in_features=32, out_features=8, bias=True)
-            (1): ReLU(inplace=True)
-            (2): Linear(in_features=8, out_features=32, bias=True)
-            (3): Sigmoid()
-            )
-            (fc0): Sequential(
-            (0): Linear(in_features=32, out_features=32, bias=True)
-            (1): ReLU(inplace=True)
-            (2): Linear(in_features=32, out_features=32, bias=True)
-            (3): ReLU(inplace=True)
-            )
-            (fc1): Sequential(
-            (0): Linear(in_features=32, out_features=32, bias=True)
-            (1): ReLU(inplace=True)
-            (2): Linear(in_features=32, out_features=8, bias=True)
-            (3): ReLU(inplace=True)
-            )
-        )
-        (tensor_network_level2): SETensorNetworkModule(
-            (fc_se): Sequential(
-            (0): Linear(in_features=64, out_features=16, bias=True)
-            (1): ReLU(inplace=True)
-            (2): Linear(in_features=16, out_features=64, bias=True)
-            (3): Sigmoid()
-            )
-            (fc0): Sequential(
-            (0): Linear(in_features=64, out_features=64, bias=True)
-            (1): ReLU(inplace=True)
-            (2): Linear(in_features=64, out_features=64, bias=True)
-            (3): ReLU(inplace=True)
-            )
-            (fc1): Sequential(
-            (0): Linear(in_features=64, out_features=64, bias=True)
-            (1): ReLU(inplace=True)
-            (2): Linear(in_features=64, out_features=16, bias=True)
-            (3): ReLU(inplace=True)
-            )
-        )
-        (tensor_network_level1): SETensorNetworkModule(
-            (fc_se): Sequential(
-            (0): Linear(in_features=128, out_features=32, bias=True)
-            (1): ReLU(inplace=True)
-            (2): Linear(in_features=32, out_features=128, bias=True)
-            (3): Sigmoid()
-            )
-            (fc0): Sequential(
-            (0): Linear(in_features=128, out_features=128, bias=True)
-            (1): ReLU(inplace=True)
-            (2): Linear(in_features=128, out_features=128, bias=True)
-            (3): ReLU(inplace=True)
-            )
-            (fc1): Sequential(
-            (0): Linear(in_features=128, out_features=128, bias=True)
-            (1): ReLU(inplace=True)
-            (2): Linear(in_features=128, out_features=32, bias=True)
-            (3): ReLU(inplace=True)
-            )
-        )
-        (fully_connected_first): Linear(in_features=56, out_features=16, bias=True)
-        (scoring_layer): Linear(in_features=16, out_features=1, bias=True)
-        (score_attention): SEAttentionModule(
-            (fc): Sequential(
-            (0): Linear(in_features=56, out_features=14, bias=True)
-            (1): ReLU(inplace=True)
-            (2): Linear(in_features=14, out_features=56, bias=True)
-            (3): Sigmoid()
-            )
-        )
-        ), self.model_c=EGSCT_classifier(
-        (scoring_layer): Linear(in_features=16, out_features=1, bias=True)
-        ) """
+        self.get_parameter_number(self.model_g)
+        self.get_parameter_number(self.model_c)
 
 
     def get_parameter_number(self, model):
@@ -222,7 +101,6 @@ class EGSCTrainer(object):
 
         self.training_graphs = GEDDataset(self.args.data_dir+'/{}'.format(self.args.dataset), self.args.dataset, train=True) 
         self.testing_graphs = GEDDataset(self.args.data_dir+'/{}'.format(self.args.dataset), self.args.dataset, train=False) 
-        print('[process_dataset] 训练图数量len(training_graphs):', len(self.training_graphs), '测试图数量len(testing_graphs):', len(self.testing_graphs)) # len(self.training_graphs): 560 len(self.testing_graphs): 140
         print(f'[process_dataset] self.training_graphs[0] = {self.training_graphs[0]}') 
         # AIDS: self.training_graphs[0] = Data(edge_index=[2, 18], i=[1], x=[10, 29], num_nodes=10)
         if self.args.dataset=="ALKANE":
@@ -289,8 +167,6 @@ class EGSCTrainer(object):
         new_data["g1"] = data[0]
         new_data["g2"] = data[1]
         
-        # print(f'[transform] batch_size:{self.args.batch_size}, new_data["g1"]:{new_data["g1"]}') # [transform] batch_size:64, new_data["g1"]:DataBatch(edge_index=[2, 1162], i=[64], x=[578, 29], num_nodes=578, batch=[578], ptr=[65])
-        # 即 i=[64]，表示64个图，与batch_size一致，ptr=[65] 比batch_size多1
 
         normalized_ged = self.nged_matrix[data[0]["i"].reshape(-1).tolist(),data[1]["i"].reshape(-1).tolist()].tolist()
         
@@ -345,28 +221,25 @@ class EGSCTrainer(object):
             log_interval = 2
         else:
             log_interval = 10
-        # epochs = trange(self.args.epochs, leave=True, desc = "Epoch") # trange是tqdm的一个子类，用于显示进度条
         loss_list = []
         loss_list_test = []
         epoch_list_test = []
         for epoch in range(self.args.epochs):
             scores = None
-            if self.args.plot: # 如果画图，就记录validation loss并添加到list，作为画validation loss曲线的数据源
-                if (epoch+1) % 10 == 0: # 每10个epoch进行一次validation, 验证训练效果，得到validation loss
-                    self.model_g.train(False) # model_g全称是model_generator，False代表不训练，即测试模式，True代表训练模式。
-                    self.model_c.train(False) # model_c全称是model_classifier，即分类器
-                    cnt_test = 20 # cnt_test全称是count_test，即测试集的数量
+            if self.args.plot: 
+                if (epoch+1) % 10 == 0: 
+                    self.model_g.train(False) 
+                    self.model_c.train(False) 
+                    cnt_test = 20 
                     cnt_train = 100 
-                    # t = tqdm(total=cnt_test*cnt_train, position=2, leave=False, desc = "Validation")
                     scores = torch.empty((cnt_test, cnt_train))
                     
-                    for i, g in enumerate(self.testing_graphs[:cnt_test].shuffle()): # i是索引，g是图 self.testing_graphs[:cnt_test]表示取前cnt_test个图，shuffle()表示打乱顺序了
-                        source_batch = Batch.from_data_list([g]*cnt_train) # 生成一个batch，里面有cnt_train个图, source_batch是源图, target_batch是目标图
-                        target_batch = Batch.from_data_list(self.training_graphs[:cnt_train].shuffle()) # 生成一个batch，里面有cnt_train个图
-                        data = self.transform((source_batch, target_batch)) # data是一个字典，里面有g1, g2, target, target_ged, transform函数是将图对转换为字典
+                    for i, g in enumerate(self.testing_graphs[:cnt_test].shuffle()): 
+                        source_batch = Batch.from_data_list([g]*cnt_train) 
+                        target_batch = Batch.from_data_list(self.training_graphs[:cnt_train].shuffle()) 
+                        data = self.transform((source_batch, target_batch)) 
                         target = data["target"]
                         
-                        # print('[Fit_Train] data["g1"]: ', data["g1"], 'data["g2"]: ', data["g2"])
                         edge_index_1 = data["g1"].edge_index.to(self.device)
                         edge_index_2 = data["g2"].edge_index.to(self.device)
                         features_1 = data["g1"].x.to(self.device)
@@ -376,57 +249,40 @@ class EGSCTrainer(object):
                         i_1 = data["g1"].i.to(self.device)
                         i_2 = data["g2"].i.to(self.device)
 
-                        # print('self.model_g.device', next(self.model_g.parameters()).device, 'self.model_c.device', next(self.model_c.parameters()).device)
-                        # print('edge_index_1.device', edge_index_1.device, 'features_1.device', features_1.device, 'batch_1.device', batch_1.device, 'i_1.device', i_1.device)
                         prediction = self.model_c(self.model_g(edge_index_1, features_1, batch_1, i_1, edge_index_2, features_2, batch_2, i_2))
-                        
-                        # tqdm.write(f'[EGSC-T/src/egsc.py] 正在执行fit函数，第{epoch}个epoch，第{i}个图，输入数据为{data}, 预测值为{prediction}，真实值为{target}')
-                        """ dataset AIDS700nef 打印信息
-                        输入数据为{
-                                'g1': DataBatch(edge_index=[2, 1600], i=[100], x=[800, 29], num_nodes=800, batch=[800], ptr=[101]), 
-                                'g2': DataBatch(edge_index=[2, 1620], i=[100], x=[835, 29], num_nodes=835, batch=[835], ptr=[101]), 
-                                'target': tensor([0.4111, 0.2865, ...]),  # torch.Size([128])
-                                'target_ged': tensor([ 8., 10.,  6., ...])},  # torch.Size([128])
-                        预测值为tensor([0.4595, 0.4602, 0.4595, ...], grad_fn=<ViewBackward0>)， # torch.Size([128])
-                        真实值为tensor([0.4111, 0.2865, 0.4493, ...]) """ 
                         
                         prediction = prediction.cpu().detach()
                         target = target.cpu().detach()
-                        # print('type(prediction)', type(prediction), 'type(target)', type(target), 'prediction.shape', prediction.shape, 'target.shape', target.shape) # type(prediction) <class 'torch.Tensor'> type(target) <class 'torch.Tensor'> prediction.shape torch.Size([100]) target.shape torch.Size([100])
-                        scores[i] = F.mse_loss(prediction, target, reduction='none').detach() # mse_loss计算过程具体为：(x - y)^2，这里的reduction='none'表示不进行求和，而是直接返回每个元素的平方
-                        # t.update(cnt_train) # 更新进度条
+                        scores[i] = F.mse_loss(prediction, target, reduction='none').detach()
                     
-                    # t.close() # 关闭进度条
-                    loss_list_test.append(scores.mean().item()) # 计算validation loss
+                    loss_list_test.append(scores.mean().item())
                     epoch_list_test.append(epoch)
-                    # print('[Fit_Valid] Epoch: {}, Loss: {:.5f}'.format(epoch+1, scores.mean().item()))
                     if self.args.wandb:
                         wandb.log({
                             "val_loss": scores.mean().item(),
                             "epoch": epoch+1,
                             })
                     
-                    self.model_g.train(True) # 训练模式，即测试完毕后，将模型切换为训练模式，以便进行下一轮的训练
+                    self.model_g.train(True) 
                     self.model_c.train(True)
             
-            batches = self.create_batches() # 生成batch
+            batches = self.create_batches() 
             main_index = 0 
             loss_sum = 0 
-            # for index, batch_pair in tqdm(enumerate(batches), total=len(batches), desc = "Batches"): # 这个循环目的是计算一个batch的loss
-            for index, batch_pair in enumerate(batches): # 这个循环目的是计算一个batch的loss
-                loss_score = self.process_batch(batch_pair) # 计算一个batch的loss
-                main_index = main_index + batch_pair[0].num_graphs # batch_pair[0]是源图，batch_pair[1]是目标图
-                loss_sum = loss_sum + loss_score # loss_sum是所有batch的loss之和
+            # for index, batch_pair in tqdm(enumerate(batches), total=len(batches), desc = "Batches"):
+            for index, batch_pair in enumerate(batches): 
+                loss_score = self.process_batch(batch_pair) 
+                main_index = main_index + batch_pair[0].num_graphs 
+                loss_sum = loss_sum + loss_score 
             loss = loss_sum / main_index 
-            # epochs.set_description("Epoch (Loss=%g)" % round(loss,5)) # 设置进度条的描述
-            loss_list.append(loss) # 将每一轮的loss加入到loss_list中
+            loss_list.append(loss) 
             
             if epoch == 0 or ((epoch+1) % log_interval) == 0:
                 if scores is not None:
-                    print('[Fit_Train] Epoch:{} Train Loss:{} Valid Loss:{}'.format(epoch+1, round(loss,5), scores.mean().item())) # 打印每一轮的loss
+                    print('[Fit_Train] Epoch:{} Train Loss:{} Valid Loss:{}'.format(epoch+1, round(loss,5), scores.mean().item()))
                 else:
-                    print('[Fit_Train] Epoch:{} Train Loss:{}'.format(epoch+1, round(loss,5))) # 打印每一轮的loss # print validation loss
-            if ((epoch+1) % self.args.test_interval) == 0: # 每test_interval轮进行一次测试Test
+                    print('[Fit_Train] Epoch:{} Train Loss:{}'.format(epoch+1, round(loss,5))) 
+            if ((epoch+1) % self.args.test_interval) == 0: 
                 self.score(epoch+1) # print Test result
             if self.args.wandb:
                 wandb.log({
@@ -439,7 +295,7 @@ class EGSCTrainer(object):
             
         if self.args.plot:
             plt.plot(loss_list, label="Train")
-            plt.plot([*range(0, self.args.epochs, 10)], loss_list_test, label="Validation") # [*range(0, self.args.epochs, 10)]表示取0, 10, 20, 30, .... self.args.epochs
+            plt.plot([*range(0, self.args.epochs, 10)], loss_list_test, label="Validation") # [*range(0, self.args.epochs, 10)] 0, 10, 20, 30, .... self.args.epochs
             plt.ylim([0, 0.01])
             plt.legend()
             
@@ -457,27 +313,26 @@ class EGSCTrainer(object):
         # if epoch is None:
         print("**************************************** Model evaluation (Test) ****************************************")
 
-        self.model_g.eval() # 将模型切换为评估模式, 即测试模式, 模型不会更新参数
+        self.model_g.eval() 
         self.model_c.eval()
         
-        scores = np.empty((len(self.testing_graphs), len(self.training_graphs))) # 生成一个空的矩阵，用于存放测试集和训练集的loss
-        ground_truth = np.empty((len(self.testing_graphs), len(self.training_graphs))) # 生成一个空的矩阵，用于存放测试集和训练集的真实值
-        ground_truth_ged = np.empty((len(self.testing_graphs), len(self.training_graphs))) # 生成一个空的矩阵，用于存放测试集和训练集的ged ged全称是graph edit distance
-        prediction_mat = np.empty((len(self.testing_graphs), len(self.training_graphs))) # 生成一个空的矩阵，用于存放测试集和训练集的预测值
+        scores = np.empty((len(self.testing_graphs), len(self.training_graphs)))
+        ground_truth = np.empty((len(self.testing_graphs), len(self.training_graphs)))
+        ground_truth_ged = np.empty((len(self.testing_graphs), len(self.training_graphs)))
+        prediction_mat = np.empty((len(self.testing_graphs), len(self.training_graphs)))
         
-        rho_list = [] # 生成一个空的列表，用于存放测试集和训练集的rho值 rho全称是spearman相关系数
-        tau_list = [] # 生成一个空的列表，用于存放测试集和训练集的tau值 tau全称是kendall相关系数
-        prec_at_10_list = [] # 生成一个空的列表，用于存放测试集和训练集的prec_at_10值 prec_at_10全称是top10的准确率
-        prec_at_20_list = [] # 生成一个空的列表，用于存放测试集和训练集的prec_at_20值 prec_at_20全称是top20的准确率
+        rho_list = [] 
+        tau_list = [] 
+        prec_at_10_list = [] 
+        prec_at_20_list = [] 
         
         # t = tqdm(total=len(self.testing_graphs)*len(self.training_graphs))
 
-        # 记录当前时间戳
         start_time = time.time()
-        for i, g in enumerate(self.testing_graphs): # 这个循环目的是计算测试集中的每个图和训练集中的每个图的loss, 会比较耗时间，训练图数量len(training_graphs): 560 测试图数量len(testing_graphs): 140
+        for i, g in enumerate(self.testing_graphs): 
             # print('[Fit_Test] enumerate(self.testing_graphs) current i =', i)
-            source_batch = Batch.from_data_list([g]*len(self.training_graphs)) # 生成一个batch，[g]*len(self.training_graphs)表示将g重复len(self.training_graphs)次, 生成一个长度为len(self.training_graphs)的列表, 列表中的每个元素都是g, 这个列表就是source_batch中的图, 也就是说source_batch中包含了len(self.training_graphs)个g, 这些g都是测试集中的图
-            target_batch = Batch.from_data_list(self.training_graphs) # 生成一个batch，里面包含了训练集中的所有图, 这些图都是训练集中的图
+            source_batch = Batch.from_data_list([g]*len(self.training_graphs)) 
+            target_batch = Batch.from_data_list(self.training_graphs) 
             # print('[teacher-score] len(source_batch) = ', len(source_batch), 'len(target_batch) = ', len(target_batch)) # 560, 560
             data = self.transform((source_batch, target_batch))
             target = data["target"]
@@ -510,9 +365,7 @@ class EGSCTrainer(object):
 
 
             # t.update(len(self.training_graphs))
-        # 记录循环结束时的时间戳
         end_time = time.time()
-        # 计算循环耗时，一共对比了140*560=78400个ged值
         score_time_cost = end_time - start_time
         if epoch is None:
             print('[Score] score_time_cost:', score_time_cost, 'seconds')

@@ -69,7 +69,7 @@ class RkdDistance(nn.Module):
         d = pdist(student, squared=False)
         mean_d = d[d>0].mean()
         d = d
-        loss = F.smooth_l1_loss(d, t_d, reduction='mean') # smooth_l1_loss是Huber loss，对于较大的误差，使用平方损失，对于较小的误差，使用绝对值损失，可以减少异常值的影响，使得模型更加鲁棒，更加稳定
+        loss = F.smooth_l1_loss(d, t_d, reduction='mean') 
         return loss
 
 def tensor_match(src,tar):

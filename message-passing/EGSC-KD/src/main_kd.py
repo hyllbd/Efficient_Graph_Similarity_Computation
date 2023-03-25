@@ -37,8 +37,8 @@ def setup_seed(seed):
     torch.manual_seed(seed) # cpu
     
     if torch.cuda.is_available():
-        torch.cuda.manual_seed(seed) # 为当前GPU设置随机种子
-        torch.cuda.manual_seed_all(seed) # 为所有GPU设置随机种子
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
         torch.backends.cudnn.deterministic = True
 
 if __name__ == "__main__":

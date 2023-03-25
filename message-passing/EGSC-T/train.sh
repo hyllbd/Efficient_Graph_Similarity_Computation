@@ -7,14 +7,14 @@ net=ginmp
 epochs=10
 bs=128
 lr=0.001
-wb=1            # 1:use wandb, 0:not use wandb
+wb=0            # 1:use wandb, 0:not use wandb
 cudaid=0
 testinterval=10
 
 # ******************************************** temp test ********************************************
 dataset='AIDS700nef'
 python -u src/main.py --dataset $dataset --gnn-operator $net --epochs $epochs --batch-size $bs --learning-rate $lr --plot --wandb $wb --cuda-id=$cudaid --test-interval $testinterval \
-> 'logs/train.log' 2>&1
+# > 'logs/train.log' 2>&1
 
 # dataset='LINUX'
 # python -u src/main.py --dataset $dataset --gnn-operator $net --epochs $epochs --batch-size $bs --learning-rate $lr --plot --wandb $wb --cuda-id=$cudaid --test-interval $testinterval \
@@ -49,21 +49,9 @@ python -u src/main.py --dataset $dataset --gnn-operator $net --epochs $epochs --
 
 
 # ******************************************** nohup ********************************************
-dataset='AIDS700nef'
-nohup python -u src/main.py --dataset $dataset --gnn-operator $net --epochs $epochs --batch-size $bs --learning-rate $lr --plot --wandb $wb --cuda-id=$cudaid --test-interval $testinterval \
-> 'logs/'$dataset'_'$net'_'$epochs'_'$bs'_'$lr'_'$cudaid'_'$testinterval'.log' 2>&1 &
-
-
-
-
-
-
-
-
-
-
-
-
+# dataset='AIDS700nef'
+# nohup python -u src/main.py --dataset $dataset --gnn-operator $net --epochs $epochs --batch-size $bs --learning-rate $lr --plot --wandb $wb --cuda-id=$cudaid --test-interval $testinterval \
+# > 'logs/'$dataset'_'$net'_'$epochs'_'$bs'_'$lr'_'$cudaid'_'$testinterval'.log' 2>&1 &
 
 
 # check process

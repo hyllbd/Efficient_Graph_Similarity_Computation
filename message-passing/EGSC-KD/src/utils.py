@@ -57,7 +57,7 @@ def tab_printer(args):
     print(t.draw())
 
 
-def calculate_ranking_correlation(rank_corr_function, prediction, target): # 这个函数是计算 Spearman's rank correlation coefficient, 即计算预测值和真实值的相关性, 值越大相关性越大，值越小相关性越小，值为 0 时表示两者无关，值为 1 时表示两者完全相关，值为 -1 时表示两者完全负相关
+def calculate_ranking_correlation(rank_corr_function, prediction, target): 
     """
     Calculating specific ranking correlation for predicted values.
     :param rank_corr_function: Ranking correlation function.
@@ -76,15 +76,15 @@ def calculate_ranking_correlation(rank_corr_function, prediction, target): # 这
     
     return rank_corr_function(r_prediction, r_target).correlation
     
-def _calculate_prec_at_k(k, target): # 这个函数是计算 k 个最小的 GED 的 index，即 target 中最小的 k 个值的 index
+def _calculate_prec_at_k(k, target): 
     target_increase = np.sort(target)
     target_value_sel = (target_increase <= target_increase[k-1]).sum()
 
     if target_value_sel > k:
-        best_k_target = target.argsort()[:target_value_sel] # argsort() 返回的是从小到大的 index
+        best_k_target = target.argsort()[:target_value_sel] 
     else:
-        best_k_target = target.argsort()[:k] # 即 target 中最小的 k 个值的 index
-    return best_k_target # 返回的是 target 中最小的 k 个值的 index
+        best_k_target = target.argsort()[:k] 
+    return best_k_target 
 
 
 def calculate_prec_at_k(k, prediction, target, target_ged):
@@ -95,8 +95,8 @@ def calculate_prec_at_k(k, prediction, target, target_ged):
     best_k_target = _calculate_prec_at_k(k, -target)
     best_k_target_ged = _calculate_prec_at_k(k, target_ged)
 
-    # 返回的是 k 个预测值中，有多少个是在 k 个最小的 GED 中的，即预测值的准确率
-    return len(set(best_k_pred).intersection(set(best_k_target_ged))) / k # 计算best_k_pred和best_k_target_ged的交集，然后除以k，即为准确率
+    
+    return len(set(best_k_pred).intersection(set(best_k_target_ged))) / k 
 
 def denormalize_sim_score(g1, g2, sim_score):
     """
@@ -259,9 +259,4 @@ def draw_weighted_nodes(filename, g, model):
     vmax = coefs.max().item() + 0.005
 
     nx.draw(G, node_color=coefs.tolist(), cmap=plt.cm.Reds, labels=labels, vmin=vmin, vmax=vmax)
-
-    # sm = plt.cm.ScalarMappable(cmap=plt.cm.Reds, norm=plt.Normalize(vmin=vmin, vmax=vmax))
-    # sm.set_array(coefs.tolist())
-    # cbar = plt.colorbar(sm)
-
     plt.savefig(filename)

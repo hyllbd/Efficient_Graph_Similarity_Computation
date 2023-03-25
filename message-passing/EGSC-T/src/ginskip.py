@@ -42,31 +42,6 @@ class GINWithSkip(nn.Module):
             # print('[GINWithSkip] linears layer:', i, 'after linear, xs[i+1].shape: ', xs[i+1].shape) # xs[i+1].shape: [num_nodes, hidden_size]
 
         x = torch.cat(xs[1:], dim=-1) # concat all the features, 1: means from the second layer
-        # print('[GINWithSkip] after cat, x.shape: ', x.shape) # x.shape: [num_nodes, hidden_size * num_layers]
-        
-        # x = self.linear(x)
-        # # print('[GINWithSkip] after linear, x.shape: ', x.shape)
-
-        """ 
-            def forward(self, x, edge_index): 定义了 forward 方法，输入参数 x 是节点特征向量，edge_index 是边的索引。
-
-            xs = [x] 用列表 xs 存储每一层的节点特征向量，初始值为输入的节点特征向量 x。
-
-            for i, conv in enumerate(self.convs): 遍历每一层的 GINConv 模块，其中 i 是层数的索引，conv 是当前层的 GINConv 模块。
-
-            x = conv(x, edge_index) 调用当前层的 GINConv 模块对节点特征向量 x 进行特征更新，输出新的节点特征向量 x。
-
-            x = self.bns[i](x) 对新的节点特征向量 x 进行批量归一化。
-
-            if i != 0: 如果不是第一层，则将上一层的节点特征向量与当前层的节点特征向量相加。
-
-            x = F.relu(x) 对节点特征向量进行 ReLU 激活函数操作。
-
-            xs.append(x) 将当前层的节点特征向量 x 存储到列表 xs 中。
-
-            for i, lin in enumerate(self.linears): 遍历每一层的线性变换模块，其中 i 是层数的索引，lin 是当前层的线性变
-        """
-
         return x
 
 

@@ -5,7 +5,7 @@ import torch.nn as nn
 from math import ceil
 from torch.nn import Linear, ReLU
 from torch_geometric.nn import DenseSAGEConv, DenseGCNConv, DenseGINConv, dense_diff_pool, JumpingKnowledge
-#from torch_geometric.utils import scatter_
+
 from utils import scatter_
 
 import pdb
@@ -17,19 +17,19 @@ def tensor_match(src,tar):
     size_x = x.shape[0]
     size_y = y.shape[0]
 
-    joint_tensor = torch.zeros(size_x*size_y, x.shape[1] + y.shape[1]) # 72 * 64, e.g.
+    joint_tensor = torch.zeros(size_x*size_y, x.shape[1] + y.shape[1]) 
 
     for i in range(size_x):
-        x_reap = x[i,:].repeat(size_y,1) # 1 * 32 -> 8 * 32
+        x_reap = x[i,:].repeat(size_y,1) 
         joint_tensor[ i * size_y : (i+1) * size_y, 0:x.shape[1]] = x_reap
-    y_reap = y.repeat(size_x,1) # 1 * 32 -> 8 * 32
+    y_reap = y.repeat(size_x,1) 
     joint_tensor[:,x.shape[1]:] = y_reap
 
     return joint_tensor
 
 
 
-class ConfusionAttentionModule(torch.nn.Module): # 后续没有用到
+class ConfusionAttentionModule(torch.nn.Module): 
     def __init__(self, args, dim_size):
         """
         :param args: Arguments object.
@@ -55,19 +55,19 @@ class ConfusionAttentionModule(torch.nn.Module): # 后续没有用到
 
     def forward(self, x_src, batch_src, x_tar, batch_tar, size=None):
         size = batch_src[-1] + 1 if batch_src[-1] == batch_tar[-1] else min(batch_src[-1], batch_tar[-1]) + 1
-        score_batch = torch.zeros(size,1) # 128 * 1
+        score_batch = torch.zeros(size,1) 
         for i in range(size):
             feat_src_batch = x_src[batch_src == i,:]
             feat_tar_batch = x_tar[batch_tar == i,:]
 
-            x_joint = torch.mm(feat_src_batch, feat_tar_batch.t()).view(-1) # on dim = 0 (shu zhe)
+            x_joint = torch.mm(feat_src_batch, feat_tar_batch.t()).view(-1) 
             
-            score_batch[i,:] = x_joint.mean() # weights.mean()
+            score_batch[i,:] = x_joint.mean() 
         
-        return score_batch # 128 * 1
+        return score_batch 
 
 
-class SEAttentionModule(torch.nn.Module): # 参考：CNN中注意力机制（PyTorch实现SE、ECA、CBAM）里的SE (Squeeze and Excitation）注意力机制 - CAD2010的文章 - 知乎 https://zhuanlan.zhihu.com/p/563549058
+class SEAttentionModule(torch.nn.Module): 
     def __init__(self, args, dim_size):
         super(SEAttentionModule, self).__init__()
         self.args = args
@@ -77,11 +77,11 @@ class SEAttentionModule(torch.nn.Module): # 参考：CNN中注意力机制（PyT
     def setup_weights(self):
         channel = self.dim_size*1
         reduction = 4
-        self.fc = nn.Sequential(# 该步骤使用两个全连接层，通过全连接层之间的非线性添加模型的复杂度，达到确定不同通道之间的权重作用
-                        nn.Linear(channel,  channel // reduction), # 为了减少计算量进行降维处理，将第一个全连接的输出采用输入的1/4或者1/16。
+        self.fc = nn.Sequential(
+                        nn.Linear(channel,  channel // reduction), 
                         nn.ReLU(inplace = True),
                         nn.Linear(channel // reduction, channel),
-                        nn.Sigmoid() # 第二个全连接层采用Sigmoid激活函数，为了将权重中映射到（0，1）之间
+                        nn.Sigmoid() 
                 )
 
     def forward(self, x):
@@ -89,7 +89,7 @@ class SEAttentionModule(torch.nn.Module): # 参考：CNN中注意力机制（PyT
         return x
 
 
-class AttentionModule_w_SE(torch.nn.Module): # 后续没有用到
+class AttentionModule_w_SE(torch.nn.Module): 
     def __init__(self, args, dim_size):
         super(AttentionModule_w_SE, self).__init__()
         self.args = args
@@ -107,17 +107,17 @@ class AttentionModule_w_SE(torch.nn.Module): # 后续没有用到
                 )
 
     def forward(self, x, batch, size=None):
-        size = batch[-1].item() + 1 if size is None else size # size is the quantity of batches: 128 eg
-        mean = scatter_('mean', x, batch, dim_size=size) # dim of mean: 128 * 16
+        size = batch[-1].item() + 1 if size is None else size 
+        mean = scatter_('mean', x, batch, dim_size=size) 
 
         transformed_global = self.fc(mean)
 
-        coefs = torch.sigmoid((x * transformed_global[batch]).sum(dim=1)) # transformed_global[batch]: 1128 * 16; coefs: 1128 * 0
-        weighted = coefs.unsqueeze(-1) * x # weighted: 1128 * 16
+        coefs = torch.sigmoid((x * transformed_global[batch]).sum(dim=1)) 
+        weighted = coefs.unsqueeze(-1) * x 
         
         return scatter_('add', weighted, batch, dim_size=size)
 
-class AttentionModule(torch.nn.Module): # 参考SimGNN/src/layers.py里的AttentionModule
+class AttentionModule(torch.nn.Module): 
     def __init__(self, args, dim_size):
         """
         :param args: Arguments object.
@@ -150,14 +150,14 @@ class AttentionModule(torch.nn.Module): # 参考SimGNN/src/layers.py里的Attent
         attention = self.fc(x)
         x = attention * x + x
 
-        size = batch[-1].item() + 1 if size is None else size # size is the quantity of batches: 128 eg
-        mean = scatter_('mean', x, batch, dim_size=size) # dim of mean: 128 * 16
+        size = batch[-1].item() + 1 if size is None else size 
+        mean = scatter_('mean', x, batch, dim_size=size) 
 
         transformed_global = torch.tanh(torch.mm(mean, self.weight_matrix)) 
-        coefs = torch.sigmoid((x * transformed_global[batch]).sum(dim=1)) # transformed_global[batch]: 1128 * 16; coefs: 1128 * 0
+        coefs = torch.sigmoid((x * transformed_global[batch]).sum(dim=1)) 
         weighted = coefs.unsqueeze(-1) * x 
 
-        return scatter_('add', weighted, batch, dim_size=size) # 128 * 16
+        return scatter_('add', weighted, batch, dim_size=size) 
         
     def get_coefs(self, x):
         mean = x.mean(dim=0)
@@ -166,7 +166,7 @@ class AttentionModule(torch.nn.Module): # 参考SimGNN/src/layers.py里的Attent
         return torch.sigmoid(torch.matmul(x, transformed_global))
 
 
-class DenseAttentionModule(torch.nn.Module): # 后续没有用到
+class DenseAttentionModule(torch.nn.Module): 
     def __init__(self, args):
         """
         :param args: Arguments object.
@@ -201,7 +201,7 @@ class DenseAttentionModule(torch.nn.Module): # 后续没有用到
         
         return weighted.sum(dim=1)
 
-class SETensorNetworkModule(torch.nn.Module): #有用到
+class SETensorNetworkModule(torch.nn.Module): 
     def __init__(self,args, dim_size):
         super(SETensorNetworkModule, self).__init__()
         self.args = args
@@ -228,7 +228,7 @@ class SETensorNetworkModule(torch.nn.Module): #有用到
         self.fc1 = nn.Sequential(
                         nn.Linear(channel,  channel),
                         nn.ReLU(inplace = True),
-                         nn.Linear(channel, self.dim_size // 2), #nn.Linear(channel, self.args.tensor_neurons),
+                         nn.Linear(channel, self.dim_size // 2), 
                         nn.ReLU(inplace = True)
                 )
 
@@ -241,7 +241,7 @@ class SETensorNetworkModule(torch.nn.Module): #有用到
 
         return scores
 
-class TensorNetworkModule(torch.nn.Module): # 后续没有用到 和SimGNN/src/layers.py里的TensorNetworkModule逻辑一致。
+class TensorNetworkModule(torch.nn.Module): 
     """
     SimGNN Tensor Network module to calculate similarity vector.
     """
@@ -270,7 +270,7 @@ class TensorNetworkModule(torch.nn.Module): # 后续没有用到 和SimGNN/src/l
         torch.nn.init.xavier_uniform_(self.bias)
 
     def forward(self, embedding_1, embedding_2):
-        batch_size = len(embedding_1) # 128
+        batch_size = len(embedding_1) 
         scoring = torch.matmul(embedding_1, self.weight_matrix.view(self.dim_size, -1)) 
         scoring = scoring.view(batch_size, self.dim_size, -1).permute([0, 2, 1])
         scoring = torch.matmul(scoring, embedding_2.view(batch_size, self.dim_size, 1)).view(batch_size, -1)
@@ -282,7 +282,7 @@ class TensorNetworkModule(torch.nn.Module): # 后续没有用到 和SimGNN/src/l
         return scores
 
 
-class Block(torch.nn.Module): # 后续没有用到 在DiffPool中用到
+class Block(torch.nn.Module): 
     def __init__(self, in_channels, hidden_channels, out_channels, mode='cat'):
         super(Block, self).__init__()
 
@@ -317,7 +317,7 @@ class Block(torch.nn.Module): # 后续没有用到 在DiffPool中用到
         return self.lin(self.jump([x1, x2]))
 
 
-class DiffPool(torch.nn.Module): # 后续没有用到
+class DiffPool(torch.nn.Module): 
     def __init__(self, args, num_nodes=10, num_layers=4, hidden=16, ratio=0.25):
         super(DiffPool, self).__init__()
         
