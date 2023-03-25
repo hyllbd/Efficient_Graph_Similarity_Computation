@@ -1,7 +1,5 @@
 # Efficient Graph Similarity Computation - KD Model
 
-<!-- ![EGSC-KD](../Figs/KD.png) -->
-
 ## Train & Test with KD
 If you run the experiment on AIDS, then
 ```
