@@ -1,7 +1,5 @@
 # Efficient Graph Similarity Computation - Teacher Model
 
-<!-- ![EGSC-T](../Figs/Teacher-Net.png) -->
-
 ## Train & Test
 If you run the experiment on AIDS, then
 ```
