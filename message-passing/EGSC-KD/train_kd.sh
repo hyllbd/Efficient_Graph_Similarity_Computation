@@ -1,8 +1,6 @@
 
-net=gin
-# net=mpnn
-# net=ginmp
-# net=ginskip
+# net=gin
+net=ginmp
 
 fixnet=ginmp
 
@@ -11,24 +9,20 @@ bs=128
 lr=0.001
 wb=0            # 1:use wandb, 0:not use wandb
 cudaid=0
-testinterval=100
+testinterval=1000
+
+checkpoint="path_to_checkpoint" # path to checkpoint
 
 dataset='AIDS700nef'
-checkpoint="../Checkpoints/AIDS700nef/EGSC_g_EarlyFusion_AIDS700nef_ginmp_1.37061_20000_128_0.001_checkpoint.pth"
-
 # dataset='LINUX'
-# checkpoint="../Checkpoints/LINUX/EGSC_g_EarlyFusion_LINUX_ginmp_0.23924_6000_128_0.001_checkpoint.pth"
-
 # dataset='IMDBMulti'
-# checkpoint="../Checkpoints/IMDBMulti/EGSC_g_EarlyFusion_IMDBMulti_ginmp_8.22481_10_128_0.001_checkpoint.pth"
-
 # dataset='ALKANE'
-# checkpoint="../Checkpoints/ALKANE/EGSC_g_EarlyFusion_ALKANE_ginmp_0.86028_10000_128_0.001_checkpoint.pth"
 
 
 # ******************************************** temp test ********************************************
+echo "python -u src/main_kd.py --dataset $dataset --gnn-operator $net --gnn-operator-fix $fixnet --epochs $epochs --batch-size $bs --learning-rate $lr --plot --wandb $wb --cuda-id=$cudaid --test-interval $testinterval --checkpoint $checkpoint"
 python -u src/main_kd.py --dataset $dataset --gnn-operator $net --gnn-operator-fix $fixnet --epochs $epochs --batch-size $bs --learning-rate $lr --plot --wandb $wb --cuda-id=$cudaid --test-interval $testinterval --checkpoint $checkpoint \
-> 'logs/train.log' 2>&1
+# > 'logs/train.log' 2>&1
 
 
 # ******************************************** not nohup ********************************************
