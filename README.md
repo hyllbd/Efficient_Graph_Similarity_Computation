@@ -54,6 +54,9 @@ pleaes go to the folder EGSC-T and the folder EGSC-KD for more training details.
 --feature-aug 4 RCE (Real Closed-Circle Counting) appraoch
 ```
 
+## Message-passing instructions:
+
+When using message-passing for experiments, please refer to [Message-passing README](https://github.com/hyllbd/Efficient_Graph_Similarity_Computation/blob/main/message-passing/README.md)
 
 
 ## Requirements
