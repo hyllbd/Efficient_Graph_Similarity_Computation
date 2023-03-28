@@ -1,7 +1,9 @@
 # Efficient Graph Similarity Computation with More Expressive Power (L45 Project)
 
 
-This repo contains the source code and dataset for our L45 mini project:
+This repo contains the source code and dataset for our L45 mini project.
+
+Authors: Wenzhao Li (wl301@cam.ac.uk) and Zejian Li (zl525@cam.ac.uk)
 
 
 ## Abstract
