@@ -13,6 +13,12 @@ Graph similarity computation (GSC) is a fundamental task that plays a crucial ro
     <br>
 </div>
 
+
+## Training and Evaluation
+[1. Train & Test with Teacher Model](https://github.com/hyllbd/Efficient_Graph_Similarity_Computation/blob/main/feature-augmentation/EGSC-T/README.md)
+
+[2. Train & Test with Student Model](https://github.com/hyllbd/Efficient_Graph_Similarity_Computation/blob/main/feature-augmentation/EGSC-KD/README.md)
+
 ## Dataset
 
 We have used the standard dataloader, i.e., ‘GEDDataset’, directly provided in the [PyG](https://pytorch-geometric.readthedocs.io/en/latest/_modules/torch_geometric/datasets/ged_dataset.html#GEDDataset).
@@ -46,7 +52,6 @@ pleaes go to the folder EGSC-T and the folder EGSC-KD to train the teacher model
 ```
 --feature-aug 4 RCE (Real Closed-Circle Counting) approach
 ```
-
 
 
 ## Requirements
