@@ -28,9 +28,8 @@ We have used the standard dataloader, i.e., ‘GEDDataset’, directly provided 
 
 ## k-length closed-circle feature augmentation related settings:
 
-When using feature-augmentation for experiments, pleaes go to the folder feature-augmentation and refer to [feature-augmentation README](https://github.com/hyllbd/Efficient_Graph_Similarity_Computation/blob/main/feature-augmentation/README.md) for more training details. 
+pleaes go to the folder EGSC-T and the folder EGSC-KD to train the teacher model and student model (through knowledge distillation) seperately.
 
-We have propose four feature-augmentation approach, which are FCE (fast Closed-Circle Existence), FCC (fast Closed-Circle Counting), RCC (Real Close-Circle Existence) and RCE (Real Closed-Circle Counting) approach.
 
 ```
 --feature-aug 1 FCE (fast Closed-Circle Existence) approach
@@ -48,9 +47,6 @@ We have propose four feature-augmentation approach, which are FCE (fast Closed-C
 --feature-aug 4 RCE (Real Closed-Circle Counting) approach
 ```
 
-## Message-passing instructions:
-
-When using message-passing for experiments, please refer to [Message-passing README](https://github.com/hyllbd/Efficient_Graph_Similarity_Computation/blob/main/message-passing/README.md)
 
 
 ## Requirements
@@ -70,6 +66,7 @@ torch-scatter     2.0.6
 torch-sparse      0.6.9
 tqdm              4.60.0
 ```
+
 
 ## Hint
 On some datasets, the results are not quite stable. We suggest to run multiple times to report the avarage one.
