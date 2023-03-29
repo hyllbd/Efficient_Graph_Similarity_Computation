@@ -1,4 +1,4 @@
-# Efficient Graph Similarity Computation via Adversarial Knowledge Distillation - (EGSC-AKD)
+# Efficient Graph Similarity Computation with More Expressive Power (Message Passing)
 
 The message-passing method is developed based on [Efficient_Graph_Similarity_Computation](https://github.com/canqin001/Efficient_Graph_Similarity_Computation) and [SMP](https://github.com/cvignac/SMP)
 
@@ -8,7 +8,6 @@ The message-passing method is developed based on [Efficient_Graph_Similarity_Com
 [2. Train & Test with Student Model](https://github.com/hyllbd/Efficient_Graph_Similarity_Computation/blob/main/message-passing/EGSC-KD/README.md)
 
 ## Dataset
-We have used the standard dataloader, i.e., ‘GEDDataset’, directly provided in the [PyG](https://pytorch-geometric.readthedocs.io/en/latest/_modules/torch_geometric/datasets/ged_dataset.html#GEDDataset).
 
 ```  AIDS700nef:  ``` https://drive.google.com/uc?export=download&id=10czBPJDEzEDI2tq7Z7mkBjLhj55F-a2z
 
@@ -18,21 +17,6 @@ We have used the standard dataloader, i.e., ‘GEDDataset’, directly provided 
 
 ```  IMDBMulti:  ``` https://drive.google.com/uc?export=download&id=12QxZ7EhYA7pJiF4cO-HuE8szhSOWcfST
 
-
-<p align="justify">
-The code takes pairs of graphs for training from an input folder where each pair of graph is stored as a JSON. Pairs of graphs used for testing are also stored as JSON files. Every node id and node label has to be indexed from 0. Keys of dictionaries are stored strings in order to make JSON serialization possible.</p>
-
-Every JSON file has the following key-value structure:
-
-```javascript
-{"graph_1": [[0, 1], [1, 2], [2, 3], [3, 4]],
- "graph_2":  [[0, 1], [1, 2], [1, 3], [3, 4], [2, 4]],
- "labels_1": [2, 2, 2, 2],
- "labels_2": [2, 3, 2, 2, 2],
- "ged": 1}
-```
-<p align="justify">
-The **graph_1** and **graph_2** keys have edge list values which descibe the connectivity structure. Similarly, the **labels_1**  and **labels_2** keys have labels for each node which are stored as list - positions in the list correspond to node identifiers. The **ged** key has an integer value which is the raw graph edit distance for the pair of graphs.</p>
 
 ## Requirements
 The codebase is implemented in Python 3.9.0. package versions used for development are just below.

@@ -1,18 +1,6 @@
-# Efficient Graph Similarity Computation with More Expressive Power (L45 Project)
+# Efficient Graph Similarity Computation with More Expressive Power (feature augmentation)
 
-
-This repo contains the source code and dataset for our L45 mini project.
-
-Authors: Wenzhao Li (wl301@cam.ac.uk) and Zejian Li (zl525@cam.ac.uk)
-
-
-## Abstract
-<div>
-    <br>
-Graph similarity computation (GSC) is a fundamental task that plays a crucial role in numerous practical applications such as drug design, anomaly detection, and identification of social groups. Complex connections and interactions between input graphs in GSC are inherently computationally expensive. Recent studies indicate that a teacher-student knowledge distillation framework can achieve both speed and accuracy. This framework enables the teacher model to perform slow learning of early feature fusion without impacting the reference speed of the student model. Given this advantage, we choose to investigate the possibility of enhancing the expressive power of GSC. Our objective is to design a more effective graph similarity computation framework with enhanced expressive power. We integrate k-length closed-circle feature augmentation and structural message-passing (SMP) into this framework separately. Experimental results indicate that our methods can improve the performance of GSC on several datasets. We present our observations and findings in the Experiments and Evaluation section.
-    <br>
-</div>
-
+The feature-augmentation method is developed based on [Efficient_Graph_Similarity_Computation](https://github.com/canqin001/Efficient_Graph_Similarity_Computation) and [Identity-aware Graph Neural Networks - ID-GNN-Fast](https://snap.stanford.edu/idgnn/)
 
 ## Training and Evaluation
 [1. Train & Test with Teacher Model](https://github.com/hyllbd/Efficient_Graph_Similarity_Computation/blob/main/feature-augmentation/EGSC-T/README.md)
@@ -20,8 +8,6 @@ Graph similarity computation (GSC) is a fundamental task that plays a crucial ro
 [2. Train & Test with Student Model](https://github.com/hyllbd/Efficient_Graph_Similarity_Computation/blob/main/feature-augmentation/EGSC-KD/README.md)
 
 ## Dataset
-
-We have used the standard dataloader, i.e., ‘GEDDataset’, directly provided in the [PyG](https://pytorch-geometric.readthedocs.io/en/latest/_modules/torch_geometric/datasets/ged_dataset.html#GEDDataset).
 
 ```  AIDS700nef:  ``` https://drive.google.com/uc?export=download&id=10czBPJDEzEDI2tq7Z7mkBjLhj55F-a2z
 

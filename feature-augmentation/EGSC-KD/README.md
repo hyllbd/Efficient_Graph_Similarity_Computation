@@ -1,6 +1,7 @@
-# Efficient Graph Similarity Computation - KD Model
+# Efficient Graph Similarity Computation - Feature Augmentation - KD Model
 
 ## Train & Test with KD
+
 If you run the experiment on AIDS with FCE, then
 ```
 python src/main_kd.py --dataset AIDS700nef --gnn-operator gin --epochs 6000 --batch-size 128 --learning-rate 0.001 --feature-aug 1
@@ -18,35 +19,9 @@ If you run the experiment on ALKANE with FCE, then
 python src/main_kd.py --dataset ALKANE --gnn-operator gin --epochs 6000 --batch-size 128 --learning-rate 0.001 --feature-aug 1
 ```
 
-
-## Train & Test with Non-KD (Student Only)
-If you run the experiment on AIDS with FCE, then
-```
-python src/main_nonkd.py --dataset AIDS700nef --gnn-operator gin --epochs 6000 --batch-size 128 --learning-rate 0.001 --feature-aug 1
-```
-If you run the experiment on LINUX with FCE, then
-```
-python src/main_nonkd.py --dataset LINUX --gnn-operator gin --epochs 6000 --batch-size 128 --learning-rate 0.001 --feature-aug 1
-```
-If you run the experiment on IMDB with FCE, then
-```
-python src/main_nonkd.py --dataset IMDBMulti --gnn-operator gin --epochs 6000 --batch-size 128 --learning-rate 0.001 --feature-aug 1
-```
-If you run the experiment on ALKANE with FCE, then
-```
-python src/main_nonkd.py --dataset ALKANE --gnn-operator gin --epochs 6000 --batch-size 128 --learning-rate 0.001 --feature-aug 1
-```
-
 You can replace the value of --feature-aug to switch different feature augmentation methods.
 
 ## Feature Augmentation
-```
---feature-aug -1: orig baseline with orign shuffle function
-```
-
-```
---feature-aug 0 (default): orig baseline with updated shuffle function
-```
 
 ```
 --feature-aug 1 FCE (fast Closed-Circle Existence) appraoch
