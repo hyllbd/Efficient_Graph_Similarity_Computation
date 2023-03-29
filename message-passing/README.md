@@ -5,7 +5,7 @@ The message-passing method is developed based on [Efficient_Graph_Similarity_Com
 ## Training and Evaluation
 [1. Train & Test with Teacher Model](https://github.com/hyllbd/Efficient_Graph_Similarity_Computation/blob/main/message-passing/EGSC-T/README.md)
 
-[2. Train & Test with Student Model](https://github.com/hyllbd/Efficient_Graph_Similarity_Computation/blob/main/message-passing/EGSC-KD/README.md)
+[2. Train & Test with KD-Student Model](https://github.com/hyllbd/Efficient_Graph_Similarity_Computation/blob/main/message-passing/EGSC-KD/README.md)
 
 ## Dataset
 
