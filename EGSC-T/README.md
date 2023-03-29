@@ -25,10 +25,6 @@ You can replace the value of --feature-aug to switch different feature augmentat
 
 ## Feature Augmentation
 ```
---feature-aug -1: orig baseline with orign shuffle function
-
---feature-aug 0 (default): orig baseline with updated shuffle function
-
 --feature-aug 1 FCE (fast Closed-Circle Existence) appraoch
 
 --feature-aug 2 FCC (fast Closed-Circle Counting) appraoch

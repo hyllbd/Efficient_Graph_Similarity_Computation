@@ -42,13 +42,6 @@ python src/main_nonkd.py --dataset ALKANE --gnn-operator gin --epochs 6000 --bat
 You can replace the value of --feature-aug to switch different feature augmentation methods.
 
 ## Feature Augmentation
-```
---feature-aug -1: orig baseline with orign shuffle function
-```
-
-```
---feature-aug 0 (default): orig baseline with updated shuffle function
-```
 
 ```
 --feature-aug 1 FCE (fast Closed-Circle Existence) appraoch

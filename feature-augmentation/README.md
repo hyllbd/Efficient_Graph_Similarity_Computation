@@ -53,7 +53,6 @@ pleaes go to the folder EGSC-T and the folder EGSC-KD to train the teacher model
 --feature-aug 4 RCE (Real Closed-Circle Counting) approach
 ```
 
-
 ## Requirements
 The codebase is implemented in Python 3.6.12. package versions used for development are just below.
 ```
@@ -71,7 +70,6 @@ torch-scatter     2.0.6
 torch-sparse      0.6.9
 tqdm              4.60.0
 ```
-
 
 ## Hint
 On some datasets, the results are not quite stable. We suggest to run multiple times to report the avarage one.
