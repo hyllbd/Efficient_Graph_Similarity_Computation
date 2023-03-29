@@ -5,7 +5,7 @@ The feature-augmentation method is developed based on [Efficient_Graph_Similarit
 ## Training and Evaluation
 [1. Train & Test with Teacher Model](https://github.com/hyllbd/Efficient_Graph_Similarity_Computation/blob/main/feature-augmentation/EGSC-T/README.md)
 
-[2. Train & Test with Student Model](https://github.com/hyllbd/Efficient_Graph_Similarity_Computation/blob/main/feature-augmentation/EGSC-KD/README.md)
+[2. Train & Test with KD-Student Model](https://github.com/hyllbd/Efficient_Graph_Similarity_Computation/blob/main/feature-augmentation/EGSC-KD/README.md)
 
 ## Dataset
 
